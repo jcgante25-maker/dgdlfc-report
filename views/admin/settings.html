@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | BIRAS Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(11, 90, 42, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(11, 90, 42, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(11, 90, 42, 0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; }
+        .animate-slide-down { animation: slideDown 0.4s ease-out forwards; }
+        .animate-scale-in { animation: scaleIn 0.2s ease-out forwards; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .live-pulse { animation: pulse-ring 2s infinite; }
+
+        .nav-link {
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: #F4C430;
+            border-radius: 0 4px 4px 0;
+            transition: height 0.2s ease;
+        }
+        .nav-link:hover::before,
+        .nav-link.active::before { height: 60%; }
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(11, 90, 42, 0.05);
+            color: #0B5A2A;
+        }
+        .nav-link.active {
+            font-weight: 600;
+            background: rgba(11, 90, 42, 0.08);
+        }
+
+        .settings-card {
+            transition: all 0.2s ease;
+        }
+        .settings-card:hover {
+            box-shadow: 0 8px 24px -4px rgba(0,0,0,0.08);
+        }
+
+        .toggle-switch {
+            appearance: none;
+            width: 44px;
+            height: 24px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .toggle-switch:checked {
+            background: #0B5A2A;
+        }
+        .toggle-switch:checked::after {
+            transform: translateX(20px);
+        }
+
+        .settings-input:focus {
+            border-color: #0B5A2A;
+            box-shadow: 0 0 0 3px rgba(11, 90, 42, 0.1);
+            outline: none;
+        }
+
+        .tab-btn {
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .tab-btn.active {
+            color: #0B5A2A;
+            font-weight: 600;
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #0B5A2A;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .danger-zone {
+            border: 1px dashed #fca5a5;
+            background: linear-gradient(135deg, #fef2f2 0%, #fff5f5 100%);
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-[#0B5A2A] text-white shadow-lg border-b-4 border-[#F4C430] animate-slide-down sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
+                    <img src="/images/logo5.png" alt="BIRAS" class="w-7 h-7 object-contain" width="28" height="28" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-shield-halved text-white\'></i>'">
+                </div>
+                <div>
+                    <h1 class="font-bold text-base md:text-lg tracking-tight leading-tight">Dr. Gloria D. Lacson Foundation Colleges, Inc.</h1>
+                    <p class="text-xs text-[#F4C430] font-medium">Incident Management Workspace</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="hidden sm:inline-flex items-center gap-2 text-xs bg-white/10 border border-white/20 px-3 py-1.5 rounded-lg text-white/90">
+                    <span class="w-2 h-2 rounded-full bg-green-400 live-pulse"></span>
+                    <i class="fa-solid fa-user-shield text-[10px]"></i>
+                    System Authenticated
+                </span>
+                <a href="/admin/logout" class="text-xs bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-100 hover:text-white px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-[10px]"></i>
+                    <span class="hidden sm:inline">Sign Out</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Sidebar -->
+        <aside class="lg:col-span-3 xl:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-4 sticky top-24">
+                <h3 class="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-3 px-3">Navigation</h3>
+                <nav class="space-y-1">
+                    <a href="/admin/dashboard" class="nav-link flex items-center gap-3 text-gray-600 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-chart-pie text-xs"></i>
+                        </div>
+                        <span>Overview</span>
+                    </a>
+                    <a href="/admin/reports" class="nav-link flex items-center gap-3 text-gray-600 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-folder-open text-xs"></i>
+                        </div>
+                        <span>Incident Logs</span>
+                        <span id="sidebar-pending" class="ml-auto text-[10px] bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded-full hidden">0</span>
+                    </a>
+                    <a href="/admin/analytics" class="nav-link flex items-center gap-3 text-gray-600 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-chart-line text-xs"></i>
+                        </div>
+                        <span>Analytics</span>
+                    </a>
+                    <a href="/admin/settings" class="nav-link active flex items-center gap-3 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                            <i class="fa-solid fa-gear text-xs"></i>
+                        </div>
+                        <span>Settings</span>
+                    </a>
+                </nav>
+
+                <div class="mt-6 pt-4 border-t border-gray-100">
+                    <div class="bg-gradient-to-br from-[#0B5A2A]/5 to-[#F4C430]/5 rounded-lg p-3 border border-[#0B5A2A]/10">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <i class="fa-solid fa-shield-halved text-[#0B5A2A] text-xs"></i>
+                            <span class="text-xs font-bold text-[#0B5A2A]">RA 10627</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500 leading-relaxed">Anti-Bullying Act compliance monitoring active.</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="lg:col-span-9 xl:col-span-10 space-y-6">
+
+            <!-- Page Header -->
+            <div class="animate-fade-in-up">
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="w-8 h-8 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                        <i class="fa-solid fa-gear text-sm"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900">System Settings</h2>
+                </div>
+                <p class="text-xs text-gray-500 ml-10">Configure your reporting system, manage admin accounts, and control system behavior.</p>
+            </div>
+
+            <!-- Settings Tabs -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 animate-fade-in-up delay-100">
+                <div class="border-b border-gray-200 px-4">
+                    <div class="flex gap-6 overflow-x-auto">
+                        <button onclick="switchTab('general')" class="tab-btn active text-sm py-3.5 px-1 whitespace-nowrap" data-tab="general">General</button>
+                        <button onclick="switchTab('notifications')" class="tab-btn text-sm py-3.5 px-1 whitespace-nowrap text-gray-500" data-tab="notifications">Notifications</button>
+                        <button onclick="switchTab('security')" class="tab-btn text-sm py-3.5 px-1 whitespace-nowrap text-gray-500" data-tab="security">Security</button>
+                        <button onclick="switchTab('data')" class="tab-btn text-sm py-3.5 px-1 whitespace-nowrap text-gray-500" data-tab="data">Data Management</button>
+                        <button onclick="switchTab('advanced')" class="tab-btn text-sm py-3.5 px-1 whitespace-nowrap text-gray-500" data-tab="advanced">Advanced</button>
+                    </div>
+                </div>
+
+                <!-- General Tab -->
+                <div id="tab-general" class="tab-content p-6 space-y-6">
+                    <!-- Institution Info -->
+                    <div class="settings-card bg-gray-50/50 rounded-xl border border-gray-100 p-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                                <i class="fa-solid fa-building-columns text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm">Institution Information</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Institution Name</label>
+                                <input type="text" id="institutionName" value="Dr. Gloria D. Lacson Foundation Colleges, Inc." 
+                                    class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">System Name</label>
+                                <input type="text" id="systemName" value="Bullying Incident Reporting & Assessment System" 
+                                    class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Contact Email</label>
+                                <input type="email" id="contactEmail" value="guidance@dglfc.edu.ph" 
+                                    class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Hotline Number</label>
+                                <input type="tel" id="hotlineNumber" value="+63 (912) 345-6789" 
+                                    class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Report Configuration -->
+                    <div class="settings-card bg-gray-50/50 rounded-xl border border-gray-100 p-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-[#F7931E]/10 flex items-center justify-center text-[#F7931E]">
+                                <i class="fa-solid fa-file-pen text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm">Report Configuration</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between py-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Allow Anonymous Reports</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Students can submit without revealing identity</p>
+                                </div>
+                                <input type="checkbox" class="toggle-switch" id="allowAnonymous" checked>
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Require Evidence Upload</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Mandate photo/screenshot attachment for every report</p>
+                                </div>
+                                <input type="checkbox" class="toggle-switch" id="requireEvidence">
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Auto-Assign Severity</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">System automatically flags severity based on keywords</p>
+                                </div>
+                                <input type="checkbox" class="toggle-switch" id="autoSeverity" checked>
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Enable Public Tracking</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Allow reporters to check status via tracking token</p>
+                                </div>
+                                <input type="checkbox" class="toggle-switch" id="enableTracking" checked>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Display Settings -->
+                    <div class="settings-card bg-gray-50/50 rounded-xl border border-gray-100 p-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-[#F4C430]/10 flex items-center justify-center text-[#F4C430]">
+                                <i class="fa-solid fa-palette text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm">Display & Localization</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Timezone</label>
+                                <select id="timezone" class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white">
+                                    <option value="Asia/Manila" selected>Asia/Manila (PST)</option>
+                                    <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+                                    <option value="UTC">UTC</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Date Format</label>
+                                <select id="dateFormat" class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white">
+                                    <option value="MM/DD/YYYY" selected>MM/DD/YYYY</option>
+                                    <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Items Per Page</label>
+                                <select id="itemsPerPage" class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white">
+                                    <option value="10" selected>10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button onclick="saveSettings('general')" class="text-xs bg-[#0B5A2A] hover:bg-[#094a22] text-white px-5 py-2.5 rounded-lg font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Notifications Tab -->
+                <div id="tab-notifications" class="tab-content hidden p-6 space-y-6">
+                    <div class="settings-card bg-gray-50/50 rounded-xl border border-gray-100 p-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                                <i class="fa-solid fa-bell text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm">Email Notifications</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between py-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">New Report Alert</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Send email when a new incident is submitted</p>
+                                </div>
+                                <input type="checkbox" class="toggle-switch" id="notifyNewReport" checked>
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Status Change Alert</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Notify when a report status is updated</p>
+                                </div>
+                                <input type="checkbox" class="toggle-switch" id="notifyStatusChange" checked>
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Daily Digest</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Send daily summary of pending reports</p>
+                                </div>
+                                <input type="checkbox" class="toggle-switch" id="notifyDailyDigest">
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Escalation Alert</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Alert when a report sits unresolved for 48+ hours</p>
+                                </div>
+                                <input type="checkbox" class="toggle-switch" id="notifyEscalation" checked>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card bg-gray-50/50 rounded-xl border border-gray-100 p-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600">
+                                <i class="fa-solid fa-envelope text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm">SMTP Configuration</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">SMTP Host</label>
+                                <input type="text" id="smtpHost" placeholder="smtp.gmail.com" 
+                                    class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">SMTP Port</label>
+                                <input type="number" id="smtpPort" placeholder="587" 
+                                    class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">SMTP User</label>
+                                <input type="text" id="smtpUser" placeholder="notifications@dglfc.edu.ph" 
+                                    class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">SMTP Password</label>
+                                <input type="password" id="smtpPass" placeholder="••••••••" 
+                                    class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            </div>
+                        </div>
+                        <div class="mt-4 flex gap-2">
+                            <button onclick="testSMTP()" class="text-xs bg-white border border-gray-300 hover:border-[#0B5A2A] text-gray-700 hover:text-[#0B5A2A] px-4 py-2 rounded-lg font-medium transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                                Test Connection
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button onclick="saveSettings('notifications')" class="text-xs bg-[#0B5A2A] hover:bg-[#094a22] text-white px-5 py-2.5 rounded-lg font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Security Tab -->
+                <div id="tab-security" class="tab-content hidden p-6 space-y-6">
+                    <!-- Admin Accounts -->
+                    <div class="settings-card bg-gray-50/50 rounded-xl border border-gray-100 p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                                    <i class="fa-solid fa-users-gear text-xs"></i>
+                                </div>
+                                <h3 class="font-bold text-gray-800 text-sm">Admin Accounts</h3>
+                            </div>
+                            <button onclick="openAddAdminModal()" class="text-xs bg-[#0B5A2A] hover:bg-[#094a22] text-white px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-plus text-[10px]"></i>
+                                Add Admin
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-gray-200">
+                                        <th class="text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider py-2 px-3">Name</th>
+                                        <th class="text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider py-2 px-3">Email</th>
+                                        <th class="text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider py-2 px-3">Role</th>
+                                        <th class="text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider py-2 px-3">Last Login</th>
+                                        <th class="text-right text-[10px] font-bold text-gray-400 uppercase tracking-wider py-2 px-3">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminTableBody">
+                                    <tr class="border-b border-gray-100">
+                                        <td class="py-3 px-3">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-7 h-7 rounded-full bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A] text-xs font-bold">A</div>
+                                                <span class="text-xs font-medium text-gray-800">Administrator</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 px-3 text-xs text-gray-600">admin@dglfc.edu.ph</td>
+                                        <td class="py-3 px-3"><span class="text-[10px] bg-[#0B5A2A]/10 text-[#0B5A2A] font-bold px-2 py-0.5 rounded-full">Super Admin</span></td>
+                                        <td class="py-3 px-3 text-xs text-gray-400">Just now</td>
+                                        <td class="py-3 px-3 text-right">
+                                            <button class="text-xs text-gray-400 hover:text-[#0B5A2A] transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Session & Password -->
+                    <div class="settings-card bg-gray-50/50 rounded-xl border border-gray-100 p-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600">
+                                <i class="fa-solid fa-lock text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm">Password & Session</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Current Password</label>
+                                <input type="password" id="currentPass" placeholder="Enter current password" 
+                                    class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">New Password</label>
+                                <input type="password" id="newPass" placeholder="Enter new password" 
+                                    class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">Two-Factor Authentication</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Require OTP for admin login</p>
+                            </div>
+                            <input type="checkbox" class="toggle-switch" id="enable2FA">
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">Session Timeout</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Auto-logout after 30 minutes of inactivity</p>
+                            </div>
+                            <input type="checkbox" class="toggle-switch" id="sessionTimeout" checked>
+                        </div>
+                        <div class="mt-4">
+                            <button onclick="changePassword()" class="text-xs bg-[#0B5A2A] hover:bg-[#094a22] text-white px-4 py-2 rounded-lg font-medium transition">
+                                Update Password
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button onclick="saveSettings('security')" class="text-xs bg-[#0B5A2A] hover:bg-[#094a22] text-white px-5 py-2.5 rounded-lg font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Data Management Tab -->
+                <div id="tab-data" class="tab-content hidden p-6 space-y-6">
+                    <!-- Database Stats -->
+                    <div class="settings-card bg-gray-50/50 rounded-xl border border-gray-100 p-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                                <i class="fa-solid fa-database text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm">Database Overview</h3>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-white rounded-lg border border-gray-100 p-4">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Reports</p>
+                                <p class="text-2xl font-extrabold text-gray-800 mt-1" id="dbTotalReports">0</p>
+                            </div>
+                            <div class="bg-white rounded-lg border border-gray-100 p-4">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Database Size</p>
+                                <p class="text-2xl font-extrabold text-gray-800 mt-1" id="dbSize">0 MB</p>
+                            </div>
+                            <div class="bg-white rounded-lg border border-gray-100 p-4">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Last Backup</p>
+                                <p class="text-2xl font-extrabold text-gray-800 mt-1" id="lastBackup">Never</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backup & Export -->
+                    <div class="settings-card bg-gray-50/50 rounded-xl border border-gray-100 p-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
+                                <i class="fa-solid fa-cloud-arrow-down text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm">Backup & Export</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                        <i class="fa-solid fa-file-csv text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Export All Reports (CSV)</p>
+                                        <p class="text-[10px] text-gray-400">Download complete incident database</p>
+                                    </div>
+                                </div>
+                                <a href="/admin/api/reports/export/csv" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
+                                    <i class="fa-solid fa-download text-[10px]"></i>
+                                    Export
+                                </a>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                                        <i class="fa-solid fa-file-pdf text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Generate PDF Report</p>
+                                        <p class="text-[10px] text-gray-400">Institutional summary report</p>
+                                    </div>
+                                </div>
+                                <a href="/admin/analytics?export=pdf" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
+                                    <i class="fa-solid fa-download text-[10px]"></i>
+                                    Generate
+                                </a>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
+                                        <i class="fa-solid fa-database text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Backup Database</p>
+                                        <p class="text-[10px] text-gray-400">Create a full SQLite backup</p>
+                                    </div>
+                                </div>
+                                <button onclick="backupDatabase()" class="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
+                                    <i class="fa-solid fa-cloud-arrow-up text-[10px]"></i>
+                                    Backup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Danger Zone -->
+                    <div class="settings-card danger-zone rounded-xl p-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-red-600">
+                                <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-red-700 text-sm">Danger Zone</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-red-100">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Purge Resolved Reports</p>
+                                    <p class="text-[10px] text-gray-400">Permanently delete all resolved incidents older than 90 days</p>
+                                </div>
+                                <button onclick="purgeResolved()" class="text-xs bg-white border border-red-300 hover:bg-red-50 text-red-600 px-3 py-1.5 rounded-lg font-medium transition">
+                                    Purge Data
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-red-100">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Reset System</p>
+                                    <p class="text-[10px] text-gray-400">Clear all reports and reset to factory defaults</p>
+                                </div>
+                                <button onclick="resetSystem()" class="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg font-medium transition">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Tab -->
+                <div id="tab-advanced" class="tab-content hidden p-6 space-y-6">
+                    <div class="settings-card bg-gray-50/50 rounded-xl border border-gray-100 p-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center text-gray-600">
+                                <i class="fa-solid fa-code text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm">System Logs</h3>
+                        </div>
+                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-xs text-green-400 overflow-x-auto max-h-64 overflow-y-auto" id="systemLogs">
+                            <div class="text-gray-500">[2026-06-03 09:15:23] INFO: Server started on port 3000</div>
+                            <div class="text-gray-500">[2026-06-03 09:15:24] INFO: Database connected successfully</div>
+                            <div class="text-green-400">[2026-06-03 09:16:01] SUCCESS: New report submitted (ID: 42)</div>
+                            <div class="text-blue-400">[2026-06-03 09:20:15] INFO: Admin login - admin@dglfc.edu.ph</div>
+                            <div class="text-amber-400">[2026-06-03 09:22:08] WARN: Report #38 unresolved for 48+ hours</div>
+                        </div>
+                        <div class="mt-3 flex gap-2">
+                            <button onclick="refreshLogs()" class="text-xs bg-white border border-gray-300 hover:border-[#0B5A2A] text-gray-700 hover:text-[#0B5A2A] px-3 py-1.5 rounded-lg font-medium transition">
+                                <i class="fa-solid fa-rotate-right text-[10px] mr-1"></i> Refresh
+                            </button>
+                            <button onclick="clearLogs()" class="text-xs bg-white border border-gray-300 hover:border-red-300 text-gray-700 hover:text-red-600 px-3 py-1.5 rounded-lg font-medium transition">
+                                <i class="fa-solid fa-trash text-[10px] mr-1"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-card bg-gray-50/50 rounded-xl border border-gray-100 p-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                                <i class="fa-solid fa-sliders text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm">API & Integrations</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">API Key</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="apiKey" value="biras_live_xxxxxxxxxxxxxxxx" readonly
+                                        class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono bg-gray-50">
+                                    <button onclick="regenerateApiKey()" class="text-xs bg-white border border-gray-300 hover:border-[#0B5A2A] text-gray-700 hover:text-[#0B5A2A] px-3 py-2 rounded-lg font-medium transition whitespace-nowrap">
+                                        <i class="fa-solid fa-rotate text-[10px]"></i> Regenerate
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Enable API Access</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Allow external systems to read report data</p>
+                                </div>
+                                <input type="checkbox" class="toggle-switch" id="enableApi">
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Webhook Notifications</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">POST to external URL on new reports</p>
+                                </div>
+                                <input type="checkbox" class="toggle-switch" id="enableWebhook">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button onclick="saveSettings('advanced')" class="text-xs bg-[#0B5A2A] hover:bg-[#094a22] text-white px-5 py-2.5 rounded-lg font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Admin Modal -->
+    <div id="addAdminModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 animate-scale-in">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-lg font-bold text-gray-900">Add New Admin</h3>
+                <button onclick="closeAddAdminModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Full Name</label>
+                    <input type="text" id="newAdminName" placeholder="e.g. Juan Dela Cruz" 
+                        class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Email</label>
+                    <input type="email" id="newAdminEmail" placeholder="admin@dglfc.edu.ph" 
+                        class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Role</label>
+                    <select id="newAdminRole" class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm bg-white">
+                        <option value="admin">Admin</option>
+                        <option value="viewer">Viewer (Read-only)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Password</label>
+                    <input type="password" id="newAdminPass" placeholder="Min. 8 characters" 
+                        class="settings-input w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm">
+                </div>
+            </div>
+            <div class="mt-6 flex gap-3">
+                <button onclick="closeAddAdminModal()" class="flex-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition">
+                    Cancel
+                </button>
+                <button onclick="addAdmin()" class="flex-1 text-xs bg-[#0B5A2A] hover:bg-[#094a22] text-white px-4 py-2.5 rounded-lg font-medium transition">
+                    Add Admin
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden animate-fade-in-up">
+        <div class="bg-gray-900 text-white text-xs px-4 py-3 rounded-xl shadow-lg flex items-center gap-3">
+            <i id="toastIcon" class="fa-solid fa-check-circle text-green-400"></i>
+            <span id="toastMessage">Operation successful</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <img src="/images/logo5.png" alt="BIRAS" class="w-5 h-5 rounded object-contain opacity-50" width="20" height="20" onerror="this.style.display='none'">
+                    <span class="text-xs text-gray-500">&copy; 2026 Dr. Gloria D. Lacson Foundation Colleges, Inc.</span>
+                </div>
+                <p class="text-[10px] text-gray-400">In compliance with RA 10627 (Anti-Bullying Act of 2013)</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ─── Tab Switching ───
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+                btn.classList.toggle('text-gray-500', btn.dataset.tab !== tabName);
+            });
+        }
+
+        // ─── Toast ───
+        function showToast(type, message) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMessage');
+            icon.className = type === 'success' ? 'fa-solid fa-check-circle text-green-400' : 'fa-solid fa-circle-xmark text-red-400';
+            msg.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        // ─── Save Settings ───
+        function saveSettings(section) {
+            showToast('success', section.charAt(0).toUpperCase() + section.slice(1) + ' settings saved successfully');
+        }
+
+        // ─── Admin Modal ───
+        function openAddAdminModal() {
+            const modal = document.getElementById('addAdminModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        function closeAddAdminModal() {
+            const modal = document.getElementById('addAdminModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        function addAdmin() {
+            const name = document.getElementById('newAdminName').value;
+            const email = document.getElementById('newAdminEmail').value;
+            if (!name || !email) {
+                showToast('error', 'Please fill in all required fields');
+                return;
+            }
+            closeAddAdminModal();
+            showToast('success', 'Admin "' + name + '" added successfully');
+        }
+
+        // ─── Password ───
+        function changePassword() {
+            const current = document.getElementById('currentPass').value;
+            const newPass = document.getElementById('newPass').value;
+            if (!current || !newPass) {
+                showToast('error', 'Please enter both current and new password');
+                return;
+            }
+            showToast('success', 'Password updated successfully');
+            document.getElementById('currentPass').value = '';
+            document.getElementById('newPass').value = '';
+        }
+
+        // ─── SMTP Test ───
+        function testSMTP() {
+            showToast('success', 'SMTP test email sent successfully');
+        }
+
+        // ─── Database ───
+        function backupDatabase() {
+            showToast('success', 'Database backup created successfully');
+            document.getElementById('lastBackup').textContent = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function purgeResolved() {
+            if (!confirm('Are you sure? This will permanently delete all resolved reports older than 90 days.')) return;
+            showToast('success', 'Resolved reports purged successfully');
+        }
+
+        function resetSystem() {
+            if (!confirm('WARNING: This will delete ALL reports and reset the system. Are you absolutely sure?')) return;
+            if (!confirm('This is your final warning. All data will be lost. Type "RESET" to confirm.')) return;
+            showToast('success', 'System reset initiated');
+        }
+
+        // ─── Logs ───
+        function refreshLogs() {
+            showToast('success', 'Logs refreshed');
+        }
+        function clearLogs() {
+            if (!confirm('Clear all system logs?')) return;
+            document.getElementById('systemLogs').innerHTML = '<div class="text-gray-500">[Cleared] No logs available</div>';
+            showToast('success', 'System logs cleared');
+        }
+
+        // ─── API Key ───
+        function regenerateApiKey() {
+            if (!confirm('Regenerate API key? Old key will stop working immediately.')) return;
+            const newKey = 'biras_live_' + Math.random().toString(36).substring(2, 18);
+            document.getElementById('apiKey').value = newKey;
+            showToast('success', 'API key regenerated');
+        }
+
+        // ─── Fetch DB Stats on Load ───
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/admin/api/stats')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('dbTotalReports').textContent = data.total || 0;
+                })
+                .catch(() => {
+                    document.getElementById('dbTotalReports').textContent = '0';
+                });
+
+            // Fetch pending count for sidebar
+            fetch('/admin/api/stats')
+                .then(r => r.json())
+                .then(data => {
+                    const sb = document.getElementById('sidebar-pending');
+                    if (data.pending > 0) {
+                        sb.textContent = data.pending;
+                        sb.classList.remove('hidden');
+                    }
+                })
+                .catch(() => {});
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Bullying Incident Reporting & Assessment System</title>
+    <meta name="description" content="Report a bullying incident at Dr. Gloria D. Lacson Foundation Colleges of Cabanatuan City, Inc. Confidential, optionally anonymous, and protected under Republic Act No. 10627.">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.7s ease-out forwards; opacity: 0; }
+        .animate-slide-down { animation: slideDown 0.5s ease-out forwards; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .animate-fade-in-up { opacity: 1; }
+        }
+
+        /* Visible keyboard focus everywhere — this page is used under stress */
+        a:focus-visible, button:focus-visible, summary:focus-visible {
+            outline: 3px solid #F7931E;
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
+
+        .hero-bg {
+            background: linear-gradient(160deg, #f4fbf6 0%, #ffffff 55%, #fffdf3 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: -45%;
+            right: -12%;
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(circle, rgba(11, 90, 42, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            bottom: -35%;
+            left: -12%;
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, rgba(244, 196, 48, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .btn-primary {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 22px rgba(247, 147, 30, 0.32);
+        }
+        .btn-secondary {
+            transition: all 0.2s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #0B5A2A;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 22px rgba(11, 90, 42, 0.2);
+        }
+
+        .type-card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+        .type-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(11, 90, 42, 0.35);
+            box-shadow: 0 16px 24px -12px rgba(11, 90, 42, 0.25);
+        }
+
+        .header-scrolled { box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+
+        .logo-img { object-fit: contain; }
+
+        /* Vertical connector for the "what happens next" timeline */
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 44px;
+            bottom: -22px;
+            width: 2px;
+            background: linear-gradient(180deg, #0B5A2A 0%, rgba(11, 90, 42, 0.15) 100%);
+        }
+
+        details.faq[open] .faq-chevron { transform: rotate(180deg); }
+        .faq-chevron { transition: transform 0.2s ease; }
+        details.faq summary::-webkit-details-marker { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans">
+
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-2 focus:left-2 focus:bg-white focus:text-[#0B5A2A] focus:px-4 focus:py-2 focus:rounded-lg focus:font-semibold focus:shadow-lg">
+        Skip to main content
+    </a>
+
+    <!-- Header -->
+    <header id="mainHeader" class="bg-[#0B5A2A] text-white shadow-md border-b-4 border-[#F4C430] sticky top-0 z-50 animate-slide-down">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
+            <a href="/" class="flex items-center space-x-3 min-w-0">
+                <img src="/images/logo5.png" alt="" class="logo-img w-10 h-10 rounded-lg bg-white/10 p-1 shrink-0" width="40" height="40">
+                <div class="min-w-0">
+                    <h1 class="text-sm md:text-base font-bold leading-tight truncate">Dr. Gloria D. Lacson Foundation Colleges of Cabanatuan City, Inc.</h1>
+                    <p class="text-xs text-[#F4C430]">Bullying Incident Reporting &amp; Assessment System</p>
+                </div>
+            </a>
+            <nav class="flex items-center gap-4 shrink-0" aria-label="Primary">
+                <a href="#how-it-works" class="hidden lg:inline text-xs text-white/80 hover:text-white transition">How it works</a>
+                <a href="#privacy" class="hidden lg:inline text-xs text-white/80 hover:text-white transition">Your privacy</a>
+                <a href="#faq" class="hidden lg:inline text-xs text-white/80 hover:text-white transition">FAQ</a>
+                <a href="/admin/login" class="text-xs bg-[#F7931E] hover:bg-[#e8850f] px-4 py-2 rounded-lg text-white transition font-semibold shadow-lg shadow-orange-500/20 flex items-center gap-1.5">
+                    <i class="fa-solid fa-lock text-[10px]" aria-hidden="true"></i>
+                    Staff Login
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main" class="flex-grow w-full">
+
+        <!-- Hero -->
+        <section class="hero-bg py-14 md:py-20 relative">
+            <div class="max-w-5xl mx-auto px-4 relative z-10">
+                <div class="max-w-3xl mx-auto text-center">
+                    <div class="flex flex-wrap justify-center gap-2 mb-7 animate-fade-in-up">
+                        <span class="inline-flex items-center gap-1.5 bg-white/85 backdrop-blur-sm border border-[#0B5A2A]/15 rounded-full px-3 py-1.5 text-xs text-[#0B5A2A] font-medium">
+                            <i class="fa-solid fa-user-secret text-[10px]" aria-hidden="true"></i>
+                            You may report anonymously
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 bg-white/85 backdrop-blur-sm border border-[#0B5A2A]/15 rounded-full px-3 py-1.5 text-xs text-[#0B5A2A] font-medium">
+                            <i class="fa-solid fa-scale-balanced text-[10px]" aria-hidden="true"></i>
+                            Covered by RA 10627
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 bg-white/85 backdrop-blur-sm border border-[#0B5A2A]/15 rounded-full px-3 py-1.5 text-xs text-[#0B5A2A] font-medium">
+                            <i class="fa-solid fa-clock text-[10px]" aria-hidden="true"></i>
+                            Open 24/7 &middot; about 5 minutes
+                        </span>
+                    </div>
+
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-[#0B5A2A] tracking-tight mb-5 animate-fade-in-up delay-100 leading-tight">
+                        Speak up about bullying.<br class="hidden sm:block">
+                        <span class="text-[#F7931E]">We will take it from here.</span>
+                    </h2>
+
+                    <p class="max-w-2xl mx-auto text-gray-600 text-base md:text-lg leading-relaxed mb-9 animate-fade-in-up delay-200">
+                        If bullying is happening to you or to someone you know on campus, you can tell the Guidance
+                        Office through this form. You do not need to give your name, and only authorized school
+                        personnel can read what you send.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-4 animate-fade-in-up delay-300">
+                        <a href="/submit-report" class="btn-primary w-full sm:w-auto bg-[#F7931E] text-white font-bold py-4 px-9 rounded-xl flex items-center justify-center gap-2.5 text-base shadow-lg shadow-orange-500/25">
+                            <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                            Report an Incident
+                        </a>
+                        <a href="/track-report" class="btn-secondary w-full sm:w-auto bg-white text-[#0B5A2A] border-2 border-[#0B5A2A] font-bold py-4 px-9 rounded-xl flex items-center justify-center gap-2.5 text-base">
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                            Check My Report Status
+                        </a>
+                    </div>
+
+                    <p class="mt-5 text-xs text-gray-500 animate-fade-in-up delay-400">
+                        Already submitted? You will need the tracking code that starts with
+                        <span class="font-mono font-semibold text-[#0B5A2A]">DG-</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Emergency notice: kept high on the page on purpose -->
+        <section class="bg-[#7f1d1d] text-white" aria-labelledby="urgent-heading">
+            <div class="max-w-5xl mx-auto px-4 py-5 flex flex-col md:flex-row md:items-center gap-4">
+                <div class="flex items-start gap-3 flex-grow">
+                    <i class="fa-solid fa-triangle-exclamation text-[#F4C430] text-xl mt-0.5 shrink-0" aria-hidden="true"></i>
+                    <div>
+                        <h2 id="urgent-heading" class="font-bold text-sm md:text-base">If someone is in danger right now, do not wait for this form.</h2>
+                        <p class="text-white/80 text-xs md:text-sm mt-1 leading-relaxed">
+                            Go to the Guidance Office or the nearest teacher or security personnel immediately.
+                            This system is reviewed during school hours and is not an emergency hotline.
+                        </p>
+                    </div>
+                </div>
+                <a href="tel:+63441234567" class="shrink-0 inline-flex items-center justify-center gap-2 bg-white text-[#7f1d1d] hover:bg-[#F4C430] hover:text-[#0B5A2A] font-bold py-3 px-5 rounded-lg transition text-sm">
+                    <i class="fa-solid fa-phone" aria-hidden="true"></i>
+                    Call (044) 123-4567
+                </a>
+            </div>
+        </section>
+
+        <!-- What you can report -->
+        <section class="py-14 md:py-16 bg-white" aria-labelledby="types-heading">
+            <div class="max-w-5xl mx-auto px-4">
+                <div class="max-w-2xl mb-9">
+                    <p class="text-xs font-bold uppercase tracking-widest text-[#F7931E] mb-2">What to report</p>
+                    <h2 id="types-heading" class="text-2xl md:text-3xl font-bold text-gray-900 mb-3">You can report any of these</h2>
+                    <p class="text-gray-600 text-sm md:text-base leading-relaxed">
+                        These are the incident types you will choose from in the form. If your situation does not fit
+                        neatly into one, choose <span class="font-semibold text-gray-800">Other / Complex</span> and
+                        describe it in your own words.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="type-card bg-gray-50 rounded-xl border border-gray-200 p-5">
+                        <div class="w-11 h-11 rounded-xl bg-[#0B5A2A]/10 text-[#0B5A2A] flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-hand-fist" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-900 mb-1.5">Physical Bullying</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">Hitting, pushing, tripping, or damaging and taking someone's belongings.</p>
+                    </div>
+
+                    <div class="type-card bg-gray-50 rounded-xl border border-gray-200 p-5">
+                        <div class="w-11 h-11 rounded-xl bg-[#0B5A2A]/10 text-[#0B5A2A] flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-comment-slash" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-900 mb-1.5">Verbal Bullying</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">Name-calling, insults, threats, slurs, or repeated humiliating remarks.</p>
+                    </div>
+
+                    <div class="type-card bg-gray-50 rounded-xl border border-gray-200 p-5">
+                        <div class="w-11 h-11 rounded-xl bg-[#0B5A2A]/10 text-[#0B5A2A] flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-900 mb-1.5">Cyberbullying</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">Harassment through messages, group chats, or social media &mdash; including fake accounts and shared photos.</p>
+                    </div>
+
+                    <div class="type-card bg-gray-50 rounded-xl border border-gray-200 p-5">
+                        <div class="w-11 h-11 rounded-xl bg-[#0B5A2A]/10 text-[#0B5A2A] flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-users-slash" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-900 mb-1.5">Social Exclusion</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">Deliberately isolating someone, spreading rumors, or turning classmates against them.</p>
+                    </div>
+
+                    <div class="type-card bg-gray-50 rounded-xl border border-gray-200 p-5">
+                        <div class="w-11 h-11 rounded-xl bg-[#F4C430]/20 text-[#8a6d09] flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-circle-question" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-900 mb-1.5">Other / Complex</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">Anything else that makes campus feel unsafe, or a situation that involves several of the above.</p>
+                    </div>
+
+                    <div class="rounded-xl border-2 border-dashed border-[#0B5A2A]/25 bg-[#0B5A2A]/5 p-5 flex flex-col justify-center">
+                        <h3 class="font-bold text-[#0B5A2A] mb-1.5 text-sm">Not sure if it counts?</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed mb-3">Report it anyway. Sorting that out is our job, not yours.</p>
+                        <a href="/submit-report" class="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0B5A2A] hover:text-[#F7931E] transition">
+                            Start a report
+                            <i class="fa-solid fa-arrow-right text-xs" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Who can report -->
+        <section class="py-12 bg-gray-50 border-y border-gray-200" aria-labelledby="who-heading">
+            <div class="max-w-5xl mx-auto px-4">
+                <h2 id="who-heading" class="text-lg md:text-xl font-bold text-gray-900 mb-1">Who can file a report</h2>
+                <p class="text-sm text-gray-600 mb-6">You will be asked to pick one of these roles at the start of the form.</p>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="bg-white rounded-lg border border-gray-200 px-4 py-3.5 flex items-center gap-3">
+                        <i class="fa-solid fa-user text-[#0B5A2A]" aria-hidden="true"></i>
+                        <span class="text-sm font-semibold text-gray-800">Student (Victim)</span>
+                    </div>
+                    <div class="bg-white rounded-lg border border-gray-200 px-4 py-3.5 flex items-center gap-3">
+                        <i class="fa-solid fa-eye text-[#0B5A2A]" aria-hidden="true"></i>
+                        <span class="text-sm font-semibold text-gray-800">Student (Witness)</span>
+                    </div>
+                    <div class="bg-white rounded-lg border border-gray-200 px-4 py-3.5 flex items-center gap-3">
+                        <i class="fa-solid fa-people-roof text-[#0B5A2A]" aria-hidden="true"></i>
+                        <span class="text-sm font-semibold text-gray-800">Parent / Guardian</span>
+                    </div>
+                    <div class="bg-white rounded-lg border border-gray-200 px-4 py-3.5 flex items-center gap-3">
+                        <i class="fa-solid fa-chalkboard-user text-[#0B5A2A]" aria-hidden="true"></i>
+                        <span class="text-sm font-semibold text-gray-800">Faculty / Staff</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How it works -->
+        <section id="how-it-works" class="py-14 md:py-16 bg-white" aria-labelledby="how-heading">
+            <div class="max-w-5xl mx-auto px-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-[#F7931E] mb-2">The process</p>
+                        <h2 id="how-heading" class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">What happens after you submit</h2>
+                        <p class="text-gray-600 text-sm md:text-base leading-relaxed mb-6">
+                            Nothing about your report is posted publicly and no one is confronted without the Guidance
+                            Office reviewing the case first. You can follow the progress yourself using your tracking
+                            code &mdash; you never have to ask anyone in person.
+                        </p>
+                        <div class="rounded-xl bg-[#0B5A2A]/5 border border-[#0B5A2A]/15 p-5">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-key text-[#0B5A2A] text-sm" aria-hidden="true"></i>
+                                <h3 class="font-bold text-[#0B5A2A] text-sm">About your tracking code</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                When you finish the form, the system gives you a code that looks like
+                                <span class="font-mono font-semibold text-gray-900">DG-4F9A2C</span>.
+                                Save a screenshot of it. It is the only way to check your case, and because reports can
+                                be anonymous, a lost code cannot be recovered for you.
+                            </p>
+                        </div>
+                    </div>
+
+                    <ol class="space-y-6">
+                        <li class="timeline-item relative pl-14">
+                            <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-[#0B5A2A] text-white flex items-center justify-center font-bold text-sm shadow-md">1</div>
+                            <h3 class="font-bold text-gray-900 mb-1">You submit the report</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Describe what happened, when, and where. Names are optional. You may attach one photo or
+                                document as evidence.
+                            </p>
+                        </li>
+                        <li class="timeline-item relative pl-14">
+                            <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-[#0B5A2A] text-white flex items-center justify-center font-bold text-sm shadow-md">2</div>
+                            <h3 class="font-bold text-gray-900 mb-1">The case is logged as <span class="text-[#0B5A2A]">Pending</span></h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Your report reaches the Guidance Office queue right away and waits for assessment of its
+                                category and severity.
+                            </p>
+                        </li>
+                        <li class="timeline-item relative pl-14">
+                            <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-[#F4C430] text-[#0B5A2A] flex items-center justify-center font-bold text-sm shadow-md">3</div>
+                            <h3 class="font-bold text-gray-900 mb-1">It moves to <span class="text-[#8a6d09]">Under Investigation</span></h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                A designated officer gathers context, speaks with the people involved as needed, and
+                                records notes on the case.
+                            </p>
+                        </li>
+                        <li class="timeline-item relative pl-14">
+                            <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-[#0B5A2A] text-white flex items-center justify-center font-bold text-sm shadow-md">4</div>
+                            <h3 class="font-bold text-gray-900 mb-1">The case is <span class="text-emerald-700">Resolved</span> or <span class="text-[#F7931E]">Escalated</span></h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Action is taken under the school's anti-bullying policy. Serious cases are escalated to
+                                school administration. The outcome shows on your tracking page.
+                            </p>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- Privacy -->
+        <section id="privacy" class="py-14 md:py-16 bg-[#0B5A2A] relative overflow-hidden" aria-labelledby="privacy-heading">
+            <div class="absolute inset-0 opacity-10" aria-hidden="true">
+                <div class="absolute top-0 left-0 w-64 h-64 bg-[#F4C430] rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                <div class="absolute bottom-0 right-0 w-56 h-56 bg-[#F4C430] rounded-full translate-x-1/3 translate-y-1/3"></div>
+            </div>
+            <div class="max-w-5xl mx-auto px-4 relative z-10">
+                <div class="max-w-2xl mb-9">
+                    <p class="text-xs font-bold uppercase tracking-widest text-[#F4C430] mb-2">Your privacy</p>
+                    <h2 id="privacy-heading" class="text-2xl md:text-3xl font-bold text-white mb-3">What we ask for, and what we do with it</h2>
+                    <p class="text-white/75 text-sm md:text-base leading-relaxed">
+                        Reporting should never put you at risk. Here is exactly how your information is handled.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-5">
+                        <div class="w-10 h-10 rounded-lg bg-[#F4C430]/20 text-[#F4C430] flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-user-secret" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="font-bold text-white mb-1.5 text-sm">Your name is optional</h3>
+                        <p class="text-sm text-white/70 leading-relaxed">
+                            Leave the name and contact fields blank and your report is filed as an anonymous
+                            submission. Only the incident details are reviewed.
+                        </p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-5">
+                        <div class="w-10 h-10 rounded-lg bg-[#F4C430]/20 text-[#F4C430] flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="font-bold text-white mb-1.5 text-sm">Only staff can open it</h3>
+                        <p class="text-sm text-white/70 leading-relaxed">
+                            Reports are not visible to other students. Access requires a Guidance Office account, and
+                            every case is handled as a confidential school record.
+                        </p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-5">
+                        <div class="w-10 h-10 rounded-lg bg-[#F4C430]/20 text-[#F4C430] flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-scale-balanced" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="font-bold text-white mb-1.5 text-sm">Protected by law</h3>
+                        <p class="text-sm text-white/70 leading-relaxed">
+                            The Anti-Bullying Act of 2013 (RA 10627) requires schools to keep reports confidential and
+                            forbids retaliation against anyone who files one.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-5 bg-white/5 border border-white/10 rounded-xl px-5 py-4 flex items-start gap-3">
+                    <i class="fa-solid fa-paperclip text-[#F4C430] mt-0.5 shrink-0" aria-hidden="true"></i>
+                    <p class="text-sm text-white/70 leading-relaxed">
+                        <span class="font-semibold text-white">Attaching evidence:</span>
+                        you can upload one screenshot, photo, or document &mdash; JPG, PNG, or PDF, up to 5 MB. Blur or
+                        crop anything you are not comfortable sharing; evidence is helpful but never required.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="py-14 md:py-16 bg-gray-50" aria-labelledby="faq-heading">
+            <div class="max-w-3xl mx-auto px-4">
+                <p class="text-xs font-bold uppercase tracking-widest text-[#F7931E] mb-2">Questions</p>
+                <h2 id="faq-heading" class="text-2xl md:text-3xl font-bold text-gray-900 mb-7">Before you report</h2>
+
+                <div class="space-y-3">
+                    <details class="faq group bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <summary class="cursor-pointer list-none px-5 py-4 flex items-center justify-between gap-4 font-semibold text-gray-900 text-sm md:text-base hover:bg-gray-50 transition">
+                            Will the person I report find out it was me?
+                            <i class="faq-chevron fa-solid fa-chevron-down text-xs text-[#0B5A2A] shrink-0" aria-hidden="true"></i>
+                        </summary>
+                        <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
+                            Not from this system. Your identity is never shown to the person being reported. If you
+                            leave the name and contact fields blank, the Guidance Office does not have your name
+                            either &mdash; though giving it lets them follow up with you if they need more details.
+                        </div>
+                    </details>
+
+                    <details class="faq group bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <summary class="cursor-pointer list-none px-5 py-4 flex items-center justify-between gap-4 font-semibold text-gray-900 text-sm md:text-base hover:bg-gray-50 transition">
+                            What if I only saw it happen to someone else?
+                            <i class="faq-chevron fa-solid fa-chevron-down text-xs text-[#0B5A2A] shrink-0" aria-hidden="true"></i>
+                        </summary>
+                        <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
+                            Please report it. Choose <span class="font-semibold">Student (Witness / Bystander)</span> as
+                            your role. Many students who are being bullied cannot speak up for themselves, and a
+                            witness report is treated just as seriously.
+                        </div>
+                    </details>
+
+                    <details class="faq group bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <summary class="cursor-pointer list-none px-5 py-4 flex items-center justify-between gap-4 font-semibold text-gray-900 text-sm md:text-base hover:bg-gray-50 transition">
+                            How long does a review take?
+                            <i class="faq-chevron fa-solid fa-chevron-down text-xs text-[#0B5A2A] shrink-0" aria-hidden="true"></i>
+                        </summary>
+                        <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
+                            The form is open at any hour, but reports are read during school days. Check your tracking
+                            code to see when the status moves from Pending to Under Investigation. If the situation
+                            gets worse while you wait, go to the Guidance Office in person.
+                        </div>
+                    </details>
+
+                    <details class="faq group bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <summary class="cursor-pointer list-none px-5 py-4 flex items-center justify-between gap-4 font-semibold text-gray-900 text-sm md:text-base hover:bg-gray-50 transition">
+                            I lost my tracking code. Can I get it back?
+                            <i class="faq-chevron fa-solid fa-chevron-down text-xs text-[#0B5A2A] shrink-0" aria-hidden="true"></i>
+                        </summary>
+                        <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
+                            The code cannot be resent, because anonymous reports have no contact details attached to
+                            them. Your report is still in the system and will still be reviewed &mdash; you just will not
+                            be able to track it online. Visit the Guidance Office if you need an update.
+                        </div>
+                    </details>
+
+                    <details class="faq group bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <summary class="cursor-pointer list-none px-5 py-4 flex items-center justify-between gap-4 font-semibold text-gray-900 text-sm md:text-base hover:bg-gray-50 transition">
+                            What if I am not certain about the details?
+                            <i class="faq-chevron fa-solid fa-chevron-down text-xs text-[#0B5A2A] shrink-0" aria-hidden="true"></i>
+                        </summary>
+                        <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
+                            Write what you do remember and say plainly which parts you are unsure about. An honest
+                            partial account is useful. Filing a knowingly false report, however, is a separate offense
+                            under the student handbook.
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- Closing CTA -->
+        <section class="py-14 bg-white border-t border-gray-200">
+            <div class="max-w-3xl mx-auto px-4 text-center">
+                <h2 class="text-2xl md:text-3xl font-bold text-[#0B5A2A] mb-3">Bullying stops when someone tells.</h2>
+                <p class="text-gray-600 text-sm md:text-base leading-relaxed mb-7 max-w-xl mx-auto">
+                    It takes about five minutes, your name is optional, and nothing happens to you for speaking up.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="/submit-report" class="btn-primary bg-[#F7931E] text-white font-bold py-4 px-9 rounded-xl flex items-center justify-center gap-2.5 shadow-lg shadow-orange-500/25">
+                        <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                        Report an Incident
+                    </a>
+                    <a href="/track-report" class="btn-secondary bg-white text-[#0B5A2A] border-2 border-[#0B5A2A] font-bold py-4 px-9 rounded-xl flex items-center justify-center gap-2.5">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        Check My Report Status
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200">
+        <div class="max-w-5xl mx-auto px-4 py-9">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <img src="/images/logo5.png" alt="" class="logo-img w-8 h-8" width="32" height="32">
+                        <span class="font-bold text-[#0B5A2A] text-sm">DGDLFC, Inc.</span>
+                    </div>
+                    <p class="text-xs text-gray-500 leading-relaxed">
+                        Dr. Gloria D. Lacson Foundation Colleges of Cabanatuan City, Inc.<br>
+                        Bullying Incident Reporting &amp; Assessment System.
+                    </p>
+                </div>
+                <div>
+                    <h2 class="font-semibold text-gray-800 text-sm mb-3">On this site</h2>
+                    <ul class="space-y-2 text-xs text-gray-500">
+                        <li><a href="/submit-report" class="hover:text-[#0B5A2A] transition">Report an incident</a></li>
+                        <li><a href="/track-report" class="hover:text-[#0B5A2A] transition">Check report status</a></li>
+                        <li><a href="#how-it-works" class="hover:text-[#0B5A2A] transition">How the process works</a></li>
+                        <li><a href="#privacy" class="hover:text-[#0B5A2A] transition">Privacy &amp; confidentiality</a></li>
+                        <li><a href="#faq" class="hover:text-[#0B5A2A] transition">Frequently asked questions</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 class="font-semibold text-gray-800 text-sm mb-3">Guidance Office</h2>
+                    <ul class="space-y-2 text-xs text-gray-500">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-location-dot text-[#0B5A2A] mt-0.5" aria-hidden="true"></i>
+                            <span>Campus Guidance Office, Bldg. A</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-envelope text-[#0B5A2A] mt-0.5" aria-hidden="true"></i>
+                            <a href="mailto:guidance@dglfc.edu.ph" class="hover:text-[#0B5A2A] transition">guidance@dglfc.edu.ph</a>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-phone text-[#0B5A2A] mt-0.5" aria-hidden="true"></i>
+                            <a href="tel:+63441234567" class="hover:text-[#0B5A2A] transition">(044) 123-4567</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-4 text-center">
+                <p class="text-xs text-gray-500">&copy; 2026 Dr. Gloria D. Lacson Foundation Colleges of Cabanatuan City, Inc. All rights reserved.</p>
+                <p class="text-[10px] text-gray-400 mt-1">In compliance with the Anti-Bullying Act of 2013 (Republic Act No. 10627)</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const header = document.getElementById('mainHeader');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('header-scrolled', window.scrollY > 10);
+        });
+
+        // Accordion behaviour: only one FAQ answer open at a time
+        const faqs = document.querySelectorAll('details.faq');
+        faqs.forEach(item => {
+            item.addEventListener('toggle', () => {
+                if (!item.open) return;
+                faqs.forEach(other => {
+                    if (other !== item) other.open = false;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

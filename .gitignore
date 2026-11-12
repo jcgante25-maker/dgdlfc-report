@@ -1,0 +1,4 @@
+.env
+database/bullying.db
+uploads/*
+node_modules/

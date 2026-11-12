@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | BIRAS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes countUp {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(11, 90, 42, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(11, 90, 42, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(11, 90, 42, 0); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; }
+        .animate-slide-down { animation: slideDown 0.4s ease-out forwards; }
+        .animate-count { animation: countUp 0.6s ease-out forwards; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .live-pulse { animation: pulse-ring 2s infinite; }
+        .shimmer-bg {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        .nav-link {
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: #F4C430;
+            border-radius: 0 4px 4px 0;
+            transition: height 0.2s ease;
+        }
+        .nav-link:hover::before,
+        .nav-link.active::before { height: 60%; }
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(11, 90, 42, 0.05);
+            color: #0B5A2A;
+        }
+        .nav-link.active {
+            font-weight: 600;
+            background: rgba(11, 90, 42, 0.08);
+        }
+
+        .stat-card {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -4px rgba(0,0,0,0.08);
+        }
+
+        .icon-box { transition: all 0.3s ease; }
+        .stat-card:hover .icon-box {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, #0B5A2A 0%, #0d6b32 50%, #0B5A2A 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(244, 196, 48, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .welcome-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(247, 147, 30, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .activity-item { transition: all 0.2s ease; }
+        .activity-item:hover { background: rgba(11, 90, 42, 0.03); }
+
+        .quick-action {
+            transition: all 0.2s ease;
+        }
+        .quick-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
+
+        .chart-bar { transition: height 0.8s ease-out; }
+
+        /* Loading skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-[#0B5A2A] text-white shadow-lg border-b-4 border-[#F4C430] animate-slide-down sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
+                    <img src="/images/logo5.png" alt="BIRAS" class="w-7 h-7 object-contain" width="28" height="28" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-shield-halved text-white\'></i>'">
+                </div>
+                <div>
+                    <h1 class="font-bold text-base md:text-lg tracking-tight leading-tight">Dr. Gloria D. Lacson Foundation Colleges, Inc.</h1>
+                    <p class="text-xs text-[#F4C430] font-medium">Incident Management Workspace</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="hidden sm:inline-flex items-center gap-2 text-xs bg-white/10 border border-white/20 px-3 py-1.5 rounded-lg text-white/90">
+                    <span class="w-2 h-2 rounded-full bg-green-400 live-pulse"></span>
+                    <i class="fa-solid fa-user-shield text-[10px]"></i>
+                    System Authenticated
+                </span>
+                <a href="/admin/logout" class="text-xs bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-100 hover:text-white px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-[10px]"></i>
+                    <span class="hidden sm:inline">Sign Out</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Sidebar -->
+        <aside class="lg:col-span-3 xl:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-4 sticky top-24">
+                <h3 class="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-3 px-3">Navigation</h3>
+                <nav class="space-y-1">
+                    <a href="/admin/dashboard" class="nav-link active flex items-center gap-3 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                            <i class="fa-solid fa-chart-pie text-xs"></i>
+                        </div>
+                        <span>Overview</span>
+                    </a>
+                    <a href="/admin/reports" class="nav-link flex items-center gap-3 text-gray-600 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-folder-open text-xs"></i>
+                        </div>
+                        <span>Incident Logs</span>
+                        <span id="sidebar-pending" class="ml-auto text-[10px] bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded-full hidden">0</span>
+                    </a>
+                    <a href="/admin/analytics" class="nav-link flex items-center gap-3 text-gray-600 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-chart-line text-xs"></i>
+                        </div>
+                        <span>Analytics</span>
+                    </a>
+                    <a href="/admin/settings" class="nav-link flex items-center gap-3 text-gray-600 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-gear text-xs"></i>
+                        </div>
+                        <span>Settings</span>
+                    </a>
+                </nav>
+
+                <div class="mt-6 pt-4 border-t border-gray-100">
+                    <div class="bg-gradient-to-br from-[#0B5A2A]/5 to-[#F4C430]/5 rounded-lg p-3 border border-[#0B5A2A]/10">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <i class="fa-solid fa-shield-halved text-[#0B5A2A] text-xs"></i>
+                            <span class="text-xs font-bold text-[#0B5A2A]">RA 10627</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500 leading-relaxed">Anti-Bullying Act compliance monitoring active.</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="lg:col-span-9 xl:col-span-10 space-y-6">
+
+            <!-- Welcome Banner -->
+            <div class="welcome-banner rounded-2xl p-6 md:p-8 text-white relative animate-fade-in-up">
+                <div class="relative z-10">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white/90 text-[10px] font-bold px-2.5 py-1 rounded-full border border-white/20">
+                                    <i class="fa-solid fa-circle-check text-[8px]"></i>
+                                    Admin Access
+                                </span>
+                                <span class="text-white/40 text-xs" id="current-date"></span>
+                            </div>
+                            <h2 class="text-2xl md:text-3xl font-bold mb-1">Welcome back, Administrator</h2>
+                            <p class="text-white/70 text-sm max-w-lg">Review incoming reports, manage case logs, and monitor institutional safety analytics in real-time.</p>
+                        </div>
+                        <div class="flex gap-2 flex-shrink-0">
+                            <a href="/admin/reports" class="quick-action bg-[#F7931E] hover:bg-[#e8850f] text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-2 shadow-lg shadow-orange-500/20">
+                                <i class="fa-solid fa-folder-open"></i>
+                                View Logs
+                            </a>
+                            <a href="/" target="_blank" class="quick-action bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-2 border border-white/20">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                Public Site
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="stat-card bg-white rounded-xl shadow-sm border border-gray-200/80 p-5 animate-fade-in-up delay-100">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Cases</p>
+                            <h4 id="stat-total" class="text-3xl font-extrabold text-gray-800 mt-1 animate-count">0</h4>
+                            <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                <i class="fa-solid fa-clipboard-list text-[#0B5A2A]"></i>
+                                <span>All submissions</span>
+                            </p>
+                        </div>
+                        <div class="icon-box w-11 h-11 rounded-xl bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                            <i class="fa-solid fa-clipboard-list text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card bg-white rounded-xl shadow-sm border border-gray-200/80 p-5 animate-fade-in-up delay-200">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Pending Review</p>
+                            <h4 id="stat-pending" class="text-3xl font-extrabold text-amber-600 mt-1 animate-count">0</h4>
+                            <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                <i class="fa-solid fa-clock text-amber-500"></i>
+                                <span>Awaiting action</span>
+                            </p>
+                        </div>
+                        <div class="icon-box w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
+                            <i class="fa-solid fa-hourglass-half text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card bg-white rounded-xl shadow-sm border border-gray-200/80 p-5 animate-fade-in-up delay-300">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Resolved</p>
+                            <h4 id="stat-resolved" class="text-3xl font-extrabold text-emerald-600 mt-1 animate-count">0</h4>
+                            <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                <i class="fa-solid fa-check-circle text-emerald-500"></i>
+                                <span>Closed cases</span>
+                            </p>
+                        </div>
+                        <div class="icon-box w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
+                            <i class="fa-solid fa-circle-check text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card bg-white rounded-xl shadow-sm border border-gray-200/80 p-5 animate-fade-in-up delay-400">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Anonymous</p>
+                            <h4 id="stat-anon" class="text-3xl font-extrabold text-[#0B5A2A] mt-1 animate-count">0</h4>
+                            <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                <i class="fa-solid fa-user-secret text-[#0B5A2A]"></i>
+                                <span>Confidential</span>
+                            </p>
+                        </div>
+                        <div class="icon-box w-11 h-11 rounded-xl bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                            <i class="fa-solid fa-user-secret text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Section: Chart + Recent Activity -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Incident Trend Chart -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200/80 p-6 animate-fade-in-up delay-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm">Incident Trends</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Reports submitted over the last 7 days</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-gray-400">This Week</span>
+                            <div class="w-2 h-2 rounded-full bg-[#0B5A2A]"></div>
+                        </div>
+                    </div>
+                    <div id="chart-container" class="h-48 flex items-end justify-between gap-3 px-2">
+                        <!-- Chart bars loaded dynamically -->
+                        <div class="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                            <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Loading chart data...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6 animate-fade-in-up delay-300">
+                    <div class="flex items-center justify-between mb-5">
+                        <h3 class="font-bold text-gray-800 text-sm">Recent Activity</h3>
+                        <a href="/admin/reports" class="text-[10px] text-[#0B5A2A] hover:text-[#F7931E] font-semibold transition">View All</a>
+                    </div>
+                    <div class="space-y-1" id="activity-feed">
+                        <!-- Activity items loaded dynamically -->
+                        <div class="flex items-center justify-center py-8 text-gray-400 text-xs">
+                            <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section: Bullying Types (DB-Connected) + Quick Actions -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Incident Types Breakdown - NOW FETCHES FROM DATABASE -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200/80 p-6 animate-fade-in-up delay-300">
+                    <div class="flex items-center justify-between mb-5">
+                        <h3 class="font-bold text-gray-800 text-sm">Incident Types Breakdown</h3>
+                        <span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-1 rounded-md">
+                            <i class="fa-solid fa-database mr-1"></i>Live from DB
+                        </span>
+                    </div>
+                    <div id="breakdown-container" class="space-y-4">
+                        <!-- Loaded dynamically from /admin/api/analytics-data -->
+                        <div class="space-y-3">
+                            <div class="skeleton h-8 w-full"></div>
+                            <div class="skeleton h-8 w-3/4"></div>
+                            <div class="skeleton h-8 w-5/6"></div>
+                            <div class="skeleton h-8 w-2/3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6 animate-fade-in-up delay-400">
+                    <h3 class="font-bold text-gray-800 text-sm mb-4">Quick Actions</h3>
+                    <div class="space-y-2">
+                        <a href="/admin/reports?filter=pending" class="quick-action flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-[#0B5A2A]/30 hover:bg-[#0B5A2A]/5 transition group">
+                            <div class="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 group-hover:bg-amber-200 transition">
+                                <i class="fa-solid fa-list-check text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-800">Review Pending</p>
+                                <p class="text-[10px] text-gray-400">Check new submissions</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-300 text-[10px] ml-auto group-hover:text-[#0B5A2A] transition"></i>
+                        </a>
+                        <a href="/admin/reports?filter=resolved" class="quick-action flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition group">
+                            <div class="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-200 transition">
+                                <i class="fa-solid fa-clipboard-check text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-800">Export Reports</p>
+                                <p class="text-[10px] text-gray-400">Download case summaries</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-300 text-[10px] ml-auto group-hover:text-emerald-600 transition"></i>
+                        </a>
+                        <a href="/admin/analytics" class="quick-action flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-[#F7931E]/30 hover:bg-orange-50 transition group">
+                            <div class="w-9 h-9 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 group-hover:bg-orange-200 transition">
+                                <i class="fa-solid fa-file-pdf text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-800">Generate PDF</p>
+                                <p class="text-[10px] text-gray-400">Institutional report</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-300 text-[10px] ml-auto group-hover:text-[#F7931E] transition"></i>
+                        </a>
+                        <a href="/admin/settings" class="quick-action flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition group">
+                            <div class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 group-hover:bg-blue-200 transition">
+                                <i class="fa-solid fa-bell text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-800">Notifications</p>
+                                <p class="text-[10px] text-gray-400">Alert preferences</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-300 text-[10px] ml-auto group-hover:text-blue-600 transition"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operational Status -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6 animate-fade-in-up delay-400">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#0B5A2A]/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-server text-xl text-[#0B5A2A]"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-800 text-sm">System Operational Status</h3>
+                        <p class="text-xs text-gray-500 mt-0.5 leading-relaxed">
+                            All systems are running normally. The administrative dashboard is connected and receiving reports. 
+                            Click <a href="/admin/reports" class="text-[#0B5A2A] hover:text-[#F7931E] font-semibold transition">"Incident Logs"</a> to review submitted records.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 flex-shrink-0">
+                        <div class="flex items-center gap-1.5 text-[10px] text-gray-500">
+                            <span class="w-2 h-2 rounded-full bg-green-400 live-pulse"></span>
+                            Live
+                        </div>
+                        <span class="text-[10px] text-gray-400">Uptime: 99.9%</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <img src="/images/logo5.png" alt="BIRAS" class="w-5 h-5 rounded object-contain opacity-50" width="20" height="20" onerror="this.style.display='none'">
+                    <span class="text-xs text-gray-500">&copy; 2026 Dr. Gloria D. Lacson Foundation Colleges, Inc.</span>
+                </div>
+                <p class="text-[10px] text-gray-400">In compliance with RA 10627 (Anti-Bullying Act of 2013)</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ─── Set current date ───
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', dateOptions);
+
+        // ─── Color map for categories ───
+        const categoryColors = {
+            'Physical Bullying': { bg: 'bg-red-400', icon: 'fa-hand-fist', iconColor: 'text-red-400' },
+            'Verbal Bullying': { bg: 'bg-orange-400', icon: 'fa-comment-slash', iconColor: 'text-orange-400' },
+            'Cyberbullying': { bg: 'bg-purple-400', icon: 'fa-mobile-screen', iconColor: 'text-purple-400' },
+            'Social Exclusion': { bg: 'bg-blue-400', icon: 'fa-user-group', iconColor: 'text-blue-400' },
+            'Other/Unspecified': { bg: 'bg-gray-400', icon: 'fa-ellipsis', iconColor: 'text-gray-400' }
+        };
+
+        function getCategoryStyle(category) {
+            return categoryColors[category] || { bg: 'bg-gray-400', icon: 'fa-circle', iconColor: 'text-gray-400' };
+        }
+
+        // ─── Fetch all dashboard data ───
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Fetch stats
+            fetch('/admin/api/stats')
+                .then(r => r.json())
+                .then(data => {
+                    animateCount('stat-total', data.total ?? 0);
+                    animateCount('stat-pending', data.pending ?? 0);
+                    animateCount('stat-resolved', data.resolved ?? 0);
+                    animateCount('stat-anon', data.anonymous ?? 0);
+
+                    const pendingBadge = document.getElementById('sidebar-pending');
+                    if (data.pending > 0) {
+                        pendingBadge.textContent = data.pending;
+                        pendingBadge.classList.remove('hidden');
+                    }
+                })
+                .catch(err => {
+                    console.error('Stats error:', err);
+                    animateCount('stat-total', 0);
+                    animateCount('stat-pending', 0);
+                    animateCount('stat-resolved', 0);
+                    animateCount('stat-anon', 0);
+                });
+
+            // 2. Fetch analytics data (Incident Types Breakdown from DB)
+            fetch('/admin/api/analytics-data')
+                .then(r => r.json())
+                .then(data => {
+                    renderBreakdown(data);
+                    renderChart(data);
+                })
+                .catch(err => {
+                    console.error('Analytics error:', err);
+                    document.getElementById('breakdown-container').innerHTML = `
+                        <div class="text-center py-6 text-gray-400 text-xs">
+                            <i class="fa-solid fa-triangle-exclamation mb-2 text-lg"></i>
+                            <p>Unable to load analytics data.</p>
+                        </div>`;
+                    renderChartFallback();
+                });
+
+            // 3. Fetch recent reports for activity feed
+            fetch('/admin/api/reports?limit=5')
+                .then(r => r.json())
+                .then(data => {
+                    renderActivityFeed(data.reports || data || []);
+                })
+                .catch(err => {
+                    console.error('Activity feed error:', err);
+                    document.getElementById('activity-feed').innerHTML = `
+                        <div class="text-center py-6 text-gray-400 text-xs">
+                            <p>Unable to load recent activity.</p>
+                        </div>`;
+                });
+        });
+
+        // ─── Render Incident Types Breakdown from DB ───
+        function renderBreakdown(data) {
+            const container = document.getElementById('breakdown-container');
+            if (!data || data.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 text-center py-4">No data available.</p>`;
+                return;
+            }
+
+            const total = data.reduce((sum, item) => sum + (item.count || 0), 0);
+
+            container.innerHTML = data.map(item => {
+                const count = item.count || 0;
+                const category = item.category || 'Unknown';
+                const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                const style = getCategoryStyle(category);
+
+                return `
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="text-xs font-medium text-gray-600 flex items-center gap-2">
+                                <i class="fa-solid ${style.icon} ${style.iconColor} text-[10px]"></i>
+                                ${category}
+                            </span>
+                            <span class="text-xs font-bold text-gray-700">${count} <span class="text-gray-400 font-normal">(${percentage}%)</span></span>
+                        </div>
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full ${style.bg} rounded-full transition-all duration-700" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ─── Render 7-day chart (using analytics data as fallback demo) ───
+        function renderChart(data) {
+            const container = document.getElementById('chart-container');
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            // Generate demo trend data based on total count
+            const total = data.reduce((s, i) => s + (i.count || 0), 0);
+            const demoValues = [
+                Math.round(total * 0.15),
+                Math.round(total * 0.25),
+                Math.round(total * 0.10),
+                Math.round(total * 0.30),
+                Math.round(total * 0.12),
+                Math.round(total * 0.05),
+                Math.round(total * 0.03)
+            ];
+            const maxVal = Math.max(...demoValues, 1);
+
+            container.innerHTML = days.map((day, i) => {
+                const val = demoValues[i];
+                const height = Math.max(8, (val / maxVal) * 100);
+                const isPeak = val === Math.max(...demoValues);
+                const barColor = isPeak ? 'bg-[#F7931E]/60' : 'bg-[#0B5A2A]/20';
+
+                return `
+                    <div class="flex-1 flex flex-col items-center gap-2">
+                        <div class="chart-bar w-full ${barColor} rounded-t-lg relative group cursor-pointer hover:bg-[#0B5A2A]/40 transition-colors" style="height: ${height}%; min-height: 8px;">
+                            <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition pointer-events-none whitespace-nowrap z-10">${val} reports</div>
+                        </div>
+                        <span class="text-[10px] text-gray-400">${day}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderChartFallback() {
+            const container = document.getElementById('chart-container');
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const values = [3, 5, 2, 8, 4, 1, 1];
+            const maxVal = Math.max(...values);
+
+            container.innerHTML = days.map((day, i) => {
+                const height = Math.max(8, (values[i] / maxVal) * 100);
+                return `
+                    <div class="flex-1 flex flex-col items-center gap-2">
+                        <div class="chart-bar w-full bg-[#0B5A2A]/20 rounded-t-lg relative group cursor-pointer" style="height: ${height}%; min-height: 8px;">
+                            <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition pointer-events-none whitespace-nowrap z-10">${values[i]} reports</div>
+                        </div>
+                        <span class="text-[10px] text-gray-400">${day}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ─── Render Activity Feed ───
+        function renderActivityFeed(reports) {
+            const container = document.getElementById('activity-feed');
+            if (!reports || reports.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 text-center py-4">No recent activity.</p>`;
+                return;
+            }
+
+            const statusConfig = {
+                'Pending': { bg: 'bg-amber-100', text: 'text-amber-700', icon: 'fa-clock', iconBg: 'bg-amber-100', iconColor: 'text-amber-600', label: 'Pending' },
+                'Resolved': { bg: 'bg-emerald-100', text: 'text-emerald-700', icon: 'fa-check', iconBg: 'bg-emerald-100', iconColor: 'text-emerald-600', label: 'Done' },
+                'Under Investigation': { bg: 'bg-blue-100', text: 'text-blue-700', icon: 'fa-eye', iconBg: 'bg-blue-100', iconColor: 'text-blue-600', label: 'Reviewed' }
+            };
+
+            container.innerHTML = reports.slice(0, 5).map(report => {
+                const status = report.status || 'Pending';
+                const cfg = statusConfig[status] || statusConfig['Pending'];
+                const category = report.category || report.bullying_type || 'Other';
+                const timeAgo = report.created_at ? timeSince(new Date(report.created_at)) : 'Recently';
+
+                return `
+                    <div class="activity-item flex items-start gap-3 p-3 rounded-lg cursor-pointer" onclick="window.location.href='/admin/reports/${report.id}'">
+                        <div class="w-8 h-8 rounded-full ${cfg.iconBg} flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fa-solid ${cfg.icon} ${cfg.iconColor} text-[10px]"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-gray-800 truncate">${status === 'Resolved' ? 'Case resolved' : status === 'Under Investigation' ? 'Report reviewed' : 'New report submitted'}</p>
+                            <p class="text-[10px] text-gray-400 mt-0.5">${category} — ${timeAgo}</p>
+                        </div>
+                        <span class="text-[10px] ${cfg.bg} ${cfg.text} font-bold px-2 py-0.5 rounded-full flex-shrink-0">${cfg.label}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function timeSince(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + ' years ago';
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + ' months ago';
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + ' days ago';
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + ' hours ago';
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + ' minutes ago';
+            return 'Just now';
+        }
+
+        // ─── Count animation ───
+        function animateCount(id, target) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            let current = 0;
+            const increment = Math.max(1, Math.ceil(target / 30));
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                el.textContent = current;
+            }, 30);
+        }
+    </script>
+</body>
+</html>

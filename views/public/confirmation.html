@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Submitted | Bullying Incident Reporting & Assessment System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col justify-between font-sans">
+
+    <header class="bg-blue-900 text-white shadow-md">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-900 font-bold text-lg">
+                    DG
+                </div>
+                <div>
+                    <h1 class="text-sm md:text-base font-bold leading-tight">Dr. Gloria D. Lacson Foundation Colleges, Inc.</h1>
+                    <p class="text-xs text-blue-200">Bullying Reporting & Assessment System</p>
+                </div>
+            </div>
+            <a href="/" class="text-sm bg-blue-800 hover:bg-blue-700 px-3 py-2 rounded text-white font-medium transition">
+                Home
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-xl mx-auto px-4 py-12 flex-grow w-full flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-lg p-8 border border-gray-200 text-center w-full">
+            
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 text-green-600 mb-6">
+                <svg class="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Incident Report Submitted Successfully</h2>
+            
+            <p class="text-blue-800 bg-blue-50 border border-blue-100 rounded-md p-3 text-sm inline-block my-2 max-w-md font-medium">
+                "Your report has been received. You did the right thing."
+            </p>
+
+            <p class="text-gray-600 text-sm mt-4 mb-6">
+                Your report has been secured within the database. To inspect status milestones or supply ongoing context anonymously, please retain your tracking system index below.
+            </p>
+
+            <div class="bg-gray-100 border border-gray-300 rounded-lg p-5 mb-4 relative overflow-hidden group">
+                <span class="block text-xs uppercase tracking-wider font-semibold text-gray-500 mb-1">
+                    Your Unique Tracking Identifier
+                </span>
+                <span id="tracking-code-display" class="block text-3xl font-mono font-bold tracking-widest text-blue-900 select-all my-2">
+                    BRS-LOADING
+                </span>
+                <p class="text-xs text-red-600 font-medium mt-1">
+                    Save this code — you will need it to check your report status.
+                </p>
+            </div>
+
+            <button id="copy-btn" 
+                class="inline-flex items-center space-x-2 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold py-2 px-6 rounded-md transition shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                </svg>
+                <span id="copy-text">Copy Code to Clipboard</span>
+            </button>
+
+            <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="/" class="text-sm font-semibold text-blue-900 hover:underline">
+                    &larr; Return to Home Dashboard
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-gray-100 border-t border-gray-200 text-center py-4 text-xs text-gray-500">
+        <p>&copy; 2026 Dr. Gloria D. Lacson Foundation Colleges, Inc. All rights reserved.</p>
+        <p class="mt-1">In compliance with the Anti-Bullying Act of 2013 (Republic Act No. 10627)</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Instantiate web parameters parsing utility
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+
+            const displayElement = document.getElementById('tracking-code-display');
+            const copyBtn = document.getElementById('copy-btn');
+            const copyText = document.getElementById('copy-text');
+
+            if (code) {
+                // Strip structural injection threats, enforce absolute alphanumeric bounds uppercase
+                displayElement.textContent = code.trim().toUpperCase();
+            } else {
+                displayElement.textContent = 'ERROR-MISSING';
+                displayElement.classList.add('text-red-600');
+                copyBtn.disabled = true;
+                copyBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+
+            // Implementation of standard system clipboard copying event
+            copyBtn.addEventListener('click', () => {
+                if (!code) return;
+                
+                navigator.clipboard.writeText(code.trim().toUpperCase())
+                    .then(() => {
+                        // Visual user action confirmation response
+                        copyText.textContent = 'Copied!';
+                        copyBtn.classList.replace('bg-blue-900', 'bg-green-600');
+                        
+                        // Revert indicator state back to standard operational status
+                        setTimeout(() => {
+                            copyText.textContent = 'Copy Code to Clipboard';
+                            copyBtn.classList.replace('bg-green-600', 'bg-blue-900');
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Clipboard interface write exception:', err);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

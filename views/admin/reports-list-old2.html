@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Logs | BIRAS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; }
+        .animate-slide-down { animation: slideDown 0.4s ease-out forwards; }
+        .animate-scale-in { animation: scaleIn 0.2s ease-out forwards; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+
+        .nav-link {
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: #F4C430;
+            border-radius: 0 4px 4px 0;
+            transition: height 0.2s ease;
+        }
+        .nav-link:hover::before,
+        .nav-link.active::before { height: 60%; }
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(11, 90, 42, 0.05);
+            color: #0B5A2A;
+        }
+        .nav-link.active {
+            font-weight: 600;
+            background: rgba(11, 90, 42, 0.08);
+        }
+
+        .table-row {
+            transition: all 0.15s ease;
+        }
+        .table-row:hover {
+            background: rgba(11, 90, 42, 0.02);
+        }
+
+        .status-badge {
+            transition: all 0.2s ease;
+        }
+
+        .btn-action {
+            transition: all 0.2s ease;
+        }
+        .btn-action:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .filter-btn {
+            transition: all 0.2s ease;
+        }
+        .filter-btn.active {
+            background: #0B5A2A;
+            color: white;
+            border-color: #0B5A2A;
+        }
+        .filter-btn:hover:not(.active) {
+            background: rgba(11, 90, 42, 0.05);
+            border-color: #0B5A2A;
+            color: #0B5A2A;
+        }
+
+        .search-input:focus {
+            border-color: #0B5A2A;
+            box-shadow: 0 0 0 3px rgba(11, 90, 42, 0.1);
+            outline: none;
+        }
+
+        .checkbox-custom {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .checkbox-custom:checked {
+            background-color: #0B5A2A;
+            border-color: #0B5A2A;
+        }
+        .checkbox-custom:checked::after {
+            content: '\2713';
+            position: absolute;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .pagination-btn {
+            transition: all 0.2s ease;
+        }
+        .pagination-btn:hover:not(:disabled) {
+            background: rgba(11, 90, 42, 0.05);
+            color: #0B5A2A;
+            border-color: #0B5A2A;
+        }
+        .pagination-btn.active {
+            background: #0B5A2A;
+            color: white;
+            border-color: #0B5A2A;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-[#0B5A2A] text-white shadow-lg border-b-4 border-[#F4C430] animate-slide-down sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
+                    <img src="/images/logo5.png" alt="BIRAS" class="w-7 h-7 object-contain" width="28" height="28" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-shield-halved text-white\'></i>'">
+                </div>
+                <div>
+                    <h1 class="font-bold text-base md:text-lg tracking-tight leading-tight">Dr. Gloria D. Lacson Foundation Colleges, Inc.</h1>
+                    <p class="text-xs text-[#F4C430] font-medium">Incident Management Workspace</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="hidden sm:inline-flex items-center gap-2 text-xs bg-white/10 border border-white/20 px-3 py-1.5 rounded-lg text-white/90">
+                    <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                    <i class="fa-solid fa-user-shield text-[10px]"></i>
+                    System Authenticated
+                </span>
+                <a href="/admin/logout" class="text-xs bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-100 hover:text-white px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-[10px]"></i>
+                    <span class="hidden sm:inline">Sign Out</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Sidebar -->
+        <aside class="lg:col-span-3 xl:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-4 sticky top-24">
+                <h3 class="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-3 px-3">Navigation</h3>
+                <nav class="space-y-1">
+                    <a href="/admin/dashboard" class="nav-link flex items-center gap-3 text-gray-600 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-chart-pie text-xs"></i>
+                        </div>
+                        <span>Overview</span>
+                    </a>
+                    <a href="/admin/reports" class="nav-link active flex items-center gap-3 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                            <i class="fa-solid fa-folder-open text-xs"></i>
+                        </div>
+                        <span>Incident Logs</span>
+                        <span id="sidebar-pending" class="ml-auto text-[10px] bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded-full hidden">0</span>
+                    </a>
+                    <a href="/admin/analytics" class="nav-link flex items-center gap-3 text-gray-600 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-chart-line text-xs"></i>
+                        </div>
+                        <span>Analytics</span>
+                    </a>
+                    <a href="/admin/settings" class="nav-link flex items-center gap-3 text-gray-600 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-gear text-xs"></i>
+                        </div>
+                        <span>Settings</span>
+                    </a>
+                </nav>
+
+                <div class="mt-6 pt-4 border-t border-gray-100">
+                    <div class="bg-gradient-to-br from-[#0B5A2A]/5 to-[#F4C430]/5 rounded-lg p-3 border border-[#0B5A2A]/10">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <i class="fa-solid fa-shield-halved text-[#0B5A2A] text-xs"></i>
+                            <span class="text-xs font-bold text-[#0B5A2A]">RA 10627</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500 leading-relaxed">Anti-Bullying Act compliance monitoring active.</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="lg:col-span-9 xl:col-span-10 space-y-6">
+
+            <!-- Page Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in-up">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-8 h-8 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                            <i class="fa-solid fa-folder-open text-sm"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900">Submitted Incident Logs</h2>
+                    </div>
+                    <p class="text-xs text-gray-500 ml-10">Review, manage, and update the status of all submitted incident reports.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="deleteSelected()" id="deleteBtn" class="hidden text-xs bg-white border border-red-300 hover:bg-red-50 text-red-600 hover:text-red-700 px-3 py-2 rounded-lg font-medium transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-trash-can text-[10px]"></i>
+                        Delete Selected
+                    </button>
+                    <button onclick="exportSelected()" id="exportBtn" class="hidden text-xs bg-white border border-gray-300 hover:border-[#0B5A2A] text-gray-700 hover:text-[#0B5A2A] px-3 py-2 rounded-lg font-medium transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-download text-[10px]"></i>
+                        Export Selected
+                    </button>
+                    <a href="/admin/reports?export=all" class="text-xs bg-[#0B5A2A] hover:bg-[#094a22] text-white px-3 py-2 rounded-lg font-medium transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-export text-[10px]"></i>
+                        Export All
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filters & Search -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-4 animate-fade-in-up delay-100">
+                <div class="flex flex-col md:flex-row gap-3">
+                    <div class="flex-1 relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="text" id="searchInput" placeholder="Search by ID, reporter, or location..."
+                            class="search-input w-full border border-gray-300 rounded-lg pl-9 pr-4 py-2.5 text-sm"
+                            oninput="filterTable()">
+                    </div>
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="setFilter('all')" class="filter-btn active text-xs font-medium px-3 py-2 rounded-lg border border-gray-200" data-filter="all">
+                            All <span class="ml-1 text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full" id="count-all">0</span>
+                        </button>
+                        <button onclick="setFilter('pending')" class="filter-btn text-xs font-medium px-3 py-2 rounded-lg border border-gray-200 text-gray-600" data-filter="pending">
+                            Pending <span class="ml-1 text-[10px] bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full" id="count-pending">0</span>
+                        </button>
+                        <button onclick="setFilter('reviewed')" class="filter-btn text-xs font-medium px-3 py-2 rounded-lg border border-gray-200 text-gray-600" data-filter="reviewed">
+                            Reviewed <span class="ml-1 text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full" id="count-reviewed">0</span>
+                        </button>
+                        <button onclick="setFilter('resolved')" class="filter-btn text-xs font-medium px-3 py-2 rounded-lg border border-gray-200 text-gray-600" data-filter="resolved">
+                            Resolved <span class="ml-1 text-[10px] bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded-full" id="count-resolved">0</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-8 animate-fade-in-up delay-200">
+                <div class="flex flex-col items-center justify-center py-8">
+                    <i class="fa-solid fa-circle-notch fa-spin text-2xl text-[#0B5A2A] mb-3"></i>
+                    <p class="text-sm text-gray-500 font-medium">Loading incident reports from database...</p>
+                </div>
+            </div>
+
+            <!-- Table Card -->
+            <div id="tableCard" class="hidden bg-white rounded-xl shadow-sm border border-gray-200/80 overflow-hidden animate-fade-in-up delay-200">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50/80 border-b border-gray-200">
+                                <th class="px-4 py-3 w-10">
+                                    <input type="checkbox" id="selectAll" class="checkbox-custom" onchange="toggleSelectAll()">
+                                </th>
+                                <th class="px-4 py-3 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="px-4 py-3 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Date & Time</th>
+                                <th class="px-4 py-3 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Reporter Name &amp; Email</th>
+                                <th class="px-4 py-3 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Type</th>
+                                <th class="px-4 py-3 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Location</th>
+                                <th class="px-4 py-3 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-4 py-3 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Evidence</th>
+                                <th class="px-4 py-3 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incidentTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="emptyState" class="hidden py-16 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
+                        <i class="fa-solid fa-inbox text-2xl text-gray-300"></i>
+                    </div>
+                    <p class="text-sm text-gray-500 font-medium">No incidents found</p>
+                    <p class="text-xs text-gray-400 mt-1">Try adjusting your filters or search query.</p>
+                </div>
+
+                <div class="border-t border-gray-200 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <p class="text-xs text-gray-500">
+                        Showing <span id="showing-start" class="font-semibold">1</span> to <span id="showing-end" class="font-semibold">10</span> of <span id="total-entries" class="font-semibold">0</span> entries
+                    </p>
+                    <div class="flex items-center gap-1" id="pagination"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bulk Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 animate-scale-in">
+            <div class="text-center mb-5">
+                <div class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-triangle-exclamation text-red-500 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Confirm Bulk Delete</h3>
+                <p class="text-xs text-gray-500 mt-2">You are about to permanently delete <span id="deleteCount" class="font-bold text-red-600">0</span> selected incident report(s). This action cannot be undone.</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()" class="flex-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition">
+                    Cancel
+                </button>
+                <button onclick="confirmDelete()" id="confirmDeleteBtn" class="flex-1 text-xs bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg font-medium transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-trash-can text-[10px]"></i>
+                    <span>Yes, Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Single Delete Confirmation Modal -->
+    <div id="singleDeleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 animate-scale-in">
+            <div class="text-center mb-5">
+                <div class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-triangle-exclamation text-red-500 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Delete Incident Report</h3>
+                <p class="text-xs text-gray-500 mt-2">Are you sure you want to delete incident <span id="singleDeleteId" class="font-bold text-red-600">#0</span>? This action cannot be undone.</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeSingleDeleteModal()" class="flex-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition">
+                    Cancel
+                </button>
+                <button onclick="confirmSingleDelete()" id="confirmSingleDeleteBtn" class="flex-1 text-xs bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg font-medium transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-trash-can text-[10px]"></i>
+                    <span>Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden animate-fade-in-up">
+        <div class="bg-gray-900 text-white text-xs px-4 py-3 rounded-xl shadow-lg flex items-center gap-3">
+            <i id="toastIcon" class="fa-solid fa-check-circle text-green-400"></i>
+            <span id="toastMessage">Operation successful</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <img src="/images/logo5.png" alt="BIRAS" class="w-5 h-5 rounded object-contain opacity-50" width="20" height="20" onerror="this.style.display='none'">
+                    <span class="text-xs text-gray-500">&copy; 2026 Dr. Gloria D. Lacson Foundation Colleges, Inc.</span>
+                </div>
+                <p class="text-[10px] text-gray-400">In compliance with RA 10627 (Anti-Bullying Act of 2013)</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ─── Data State ───
+        let allIncidents = [];
+        let currentFilter = 'all';
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let selectedIds = new Set();
+        let singleDeleteId = null;
+
+        const statusStyles = {
+            Pending: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', icon: 'fa-clock', label: 'Pending' },
+            'Under Investigation': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', icon: 'fa-eye', label: 'Reviewed' },
+            Resolved: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', icon: 'fa-check', label: 'Resolved' }
+        };
+
+        const typeIcons = {
+            'Physical Bullying': 'fa-hand-fist',
+            'Verbal Bullying': 'fa-comment-slash',
+            Cyberbullying: 'fa-mobile-screen',
+            'Social Exclusion': 'fa-user-group',
+            'Other/Unspecified': 'fa-ellipsis'
+        };
+
+        // ─── Initialize: Fetch from Database ───
+        document.addEventListener('DOMContentLoaded', () => {
+            loadIncidents();
+        });
+
+        function loadIncidents() {
+            showLoading(true);
+
+            fetch('/admin/api/reports')
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to fetch reports');
+                    return res.json();
+                })
+                .then(data => {
+                    allIncidents = Array.isArray(data) ? data : (data.reports || []);
+                    showLoading(false);
+                    updateCounts();
+                    renderTable();
+                })
+                .catch(err => {
+                    console.error('Load error:', err);
+                    showLoading(false);
+                    showToast('error', 'Failed to load reports from database.');
+                    // Show empty state
+                    allIncidents = [];
+                    updateCounts();
+                    renderTable();
+                });
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingState').classList.toggle('hidden', !show);
+            document.getElementById('tableCard').classList.toggle('hidden', show);
+        }
+
+        // ─── Update Filter Counts ───
+        function updateCounts() {
+            const counts = {
+                all: allIncidents.length,
+                pending: allIncidents.filter(i => i.status === 'Pending').length,
+                reviewed: allIncidents.filter(i => i.status === 'Under Investigation').length,
+                resolved: allIncidents.filter(i => i.status === 'Resolved').length
+            };
+            document.getElementById('count-all').textContent = counts.all;
+            document.getElementById('count-pending').textContent = counts.pending;
+            document.getElementById('count-reviewed').textContent = counts.reviewed;
+            document.getElementById('count-resolved').textContent = counts.resolved;
+
+            const sb = document.getElementById('sidebar-pending');
+            if (counts.pending > 0) {
+                sb.textContent = counts.pending;
+                sb.classList.remove('hidden');
+            } else {
+                sb.classList.add('hidden');
+            }
+        }
+
+        // ─── Filter Table ───
+        function setFilter(filter) {
+            currentFilter = filter;
+            currentPage = 1;
+            selectedIds.clear();
+            document.getElementById('selectAll').checked = false;
+            updateExportButton();
+            updateDeleteButton();
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
+            });
+            renderTable();
+        }
+
+        function getFilteredData() {
+            let data = allIncidents;
+            if (currentFilter !== 'all') {
+                const statusMap = { pending: 'Pending', reviewed: 'Under Investigation', resolved: 'Resolved' };
+                data = data.filter(i => i.status === statusMap[currentFilter]);
+            }
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            if (search) {
+                data = data.filter(i =>
+                    (i.id?.toString() || '').includes(search) ||
+                    (i.reporter_name || '').toLowerCase().includes(search) ||
+                    (i.reporter_type || '').toLowerCase().includes(search) ||
+                    (i.incident_location || '').toLowerCase().includes(search) ||
+                    (i.category || '').toLowerCase().includes(search)
+                );
+            }
+            return data;
+        }
+
+        function filterTable() {
+            currentPage = 1;
+            renderTable();
+        }
+
+        // ─── Render Table ───
+        function renderTable() {
+            const data = getFilteredData();
+            const tbody = document.getElementById('incidentTableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (data.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                document.getElementById('showing-start').textContent = 0;
+                document.getElementById('showing-end').textContent = 0;
+                document.getElementById('total-entries').textContent = 0;
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = Math.min(start + itemsPerPage, data.length);
+            const pageData = data.slice(start, end);
+
+            document.getElementById('showing-start').textContent = start + 1;
+            document.getElementById('showing-end').textContent = end;
+            document.getElementById('total-entries').textContent = data.length;
+
+            tbody.innerHTML = pageData.map(incident => {
+                const status = statusStyles[incident.status] || statusStyles['Pending'];
+                const typeIcon = typeIcons[incident.category] || 'fa-circle';
+                const date = incident.created_at
+                    ? new Date(incident.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    : 'N/A';
+                const reporterType = String(incident.reporter_type || '').toLowerCase();
+                const reporterName = String(incident.reporter_name || '').trim();
+                const isAnon =
+                    incident.is_anonymous === 1 ||
+                    incident.is_anonymous === true ||
+                    reporterType === 'anonymous' ||
+                    reporterName.toLowerCase() === 'anonymous' ||
+                    reporterName.toLowerCase() === 'anonymous submission';
+
+                const reporterDisplay = isAnon ? 'Anonymous' : (reporterName || 'Not provided');
+                const reporterEmail = isAnon
+                    ? 'Hidden for anonymous report'
+                    : (incident.reporter_contact || 'Not provided');
+
+                return `
+                    <tr class="table-row border-b border-gray-100">
+                        <td class="px-4 py-3.5">
+                            <input type="checkbox" class="checkbox-custom row-checkbox" value="${incident.id}"
+                                ${selectedIds.has(incident.id) ? 'checked' : ''} onchange="toggleRow(${incident.id})">
+                        </td>
+                        <td class="px-4 py-3.5">
+                            <span class="text-xs font-bold text-gray-700">#${incident.id}</span>
+                        </td>
+                        <td class="px-4 py-3.5">
+                            <span class="text-xs text-gray-600">${date}</span>
+                        </td>
+                        <td class="px-4 py-3.5">
+                            <div class="flex items-start gap-2">
+                                <div class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid ${isAnon ? 'fa-user-secret' : 'fa-user'} text-[10px] text-gray-500"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-semibold text-gray-800">${reporterDisplay}</p>
+                                    <p class="text-[10px] text-gray-500 mt-1 break-all">
+                                        <i class="fa-solid ${isAnon ? 'fa-eye-slash' : 'fa-envelope'} mr-1"></i>
+                                        ${reporterEmail}
+                                    </p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">${isAnon ? 'Identity hidden' : (incident.reporter_type || 'Named submission')}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3.5">
+                            <span class="text-xs text-gray-700 flex items-center gap-1.5">
+                                <i class="fa-solid ${typeIcon} text-[10px] text-gray-400"></i>
+                                ${incident.category || 'Other'}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3.5">
+                            <span class="text-xs text-gray-600 flex items-center gap-1">
+                                <i class="fa-solid fa-location-dot text-[10px] text-gray-400"></i>
+                                ${incident.incident_location || 'N/A'}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3.5">
+                            <span class="status-badge inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full border ${status.bg} ${status.text} ${status.border}">
+                                <i class="fa-solid ${status.icon} text-[8px]"></i>
+                                ${status.label}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3.5">
+                            ${incident.evidence_path
+                                ? '<span class="inline-flex items-center gap-1 text-[10px] text-[#0B5A2A] font-medium"><i class="fa-solid fa-paperclip text-[10px]"></i> Attached</span>'
+                                : '<span class="text-[10px] text-gray-400">—</span>'}
+                        </td>
+                        <td class="px-4 py-3.5 text-right">
+                            <div class="flex items-center justify-end gap-1">
+                                <a href="/admin/reports/${incident.id}" class="btn-action inline-flex items-center gap-1 text-xs bg-white border border-gray-200 hover:border-[#0B5A2A] text-gray-600 hover:text-[#0B5A2A] px-3 py-1.5 rounded-lg font-medium transition">
+                                    <i class="fa-solid fa-eye text-[10px]"></i>
+                                    Review
+                                </a>
+                                <button onclick="openSingleDelete(${incident.id})" class="btn-action inline-flex items-center gap-1 text-xs bg-white border border-gray-200 hover:border-red-300 hover:bg-red-50 text-gray-400 hover:text-red-500 px-2 py-1.5 rounded-lg font-medium transition" title="Delete">
+                                    <i class="fa-solid fa-trash text-[10px]"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            renderPagination(totalPages);
+        }
+
+        // ─── Pagination ───
+        function renderPagination(totalPages) {
+            const container = document.getElementById('pagination');
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}
+                    class="pagination-btn text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 text-gray-500 disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                </button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                html += `
+                    <button onclick="goToPage(${i})"
+                        class="pagination-btn text-xs px-3 py-1.5 rounded-lg border ${i === currentPage ? 'active' : 'border-gray-200 text-gray-600'}">
+                        ${i}
+                    </button>
+                `;
+            }
+
+            html += `
+                <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}
+                    class="pagination-btn text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 text-gray-500 disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderTable();
+        }
+
+        // ─── Selection ───
+        function toggleSelectAll() {
+            const checked = document.getElementById('selectAll').checked;
+            const data = getFilteredData();
+            const pageIds = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(i => i.id);
+
+            pageIds.forEach(id => {
+                if (checked) selectedIds.add(id);
+                else selectedIds.delete(id);
+            });
+
+            document.querySelectorAll('.row-checkbox').forEach(cb => {
+                cb.checked = checked;
+            });
+
+            updateExportButton();
+            updateDeleteButton();
+        }
+
+        function toggleRow(id) {
+            if (selectedIds.has(id)) selectedIds.delete(id);
+            else selectedIds.add(id);
+            updateExportButton();
+            updateDeleteButton();
+        }
+
+        function updateExportButton() {
+            const btn = document.getElementById('exportBtn');
+            if (selectedIds.size > 0) {
+                btn.classList.remove('hidden');
+                btn.innerHTML = `<i class="fa-solid fa-download text-[10px]"></i> Export Selected (${selectedIds.size})`;
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
+
+        function updateDeleteButton() {
+            const btn = document.getElementById('deleteBtn');
+            if (selectedIds.size > 0) {
+                btn.classList.remove('hidden');
+                btn.innerHTML = `<i class="fa-solid fa-trash-can text-[10px]"></i> Delete Selected (${selectedIds.size})`;
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
+
+        function exportSelected() {
+            alert('Exporting ' + selectedIds.size + ' selected incidents...');
+        }
+
+        // ─── Bulk Delete ───
+        function deleteSelected() {
+            if (selectedIds.size === 0) return;
+            document.getElementById('deleteCount').textContent = selectedIds.size;
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function confirmDelete() {
+            const btn = document.getElementById('confirmDeleteBtn');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-[10px]"></i> <span>Deleting...</span>';
+
+            const ids = Array.from(selectedIds);
+
+            fetch('/admin/api/reports/bulk-delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: ids })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Delete failed');
+                return res.json();
+            })
+            .then(data => {
+                selectedIds.clear();
+                document.getElementById('selectAll').checked = false;
+                updateExportButton();
+                updateDeleteButton();
+                closeDeleteModal();
+                showToast('success', `${ids.length} incident(s) deleted successfully`);
+                // RELOAD FROM DATABASE to confirm deletion
+                loadIncidents();
+            })
+            .catch(err => {
+                console.error('Delete error:', err);
+                closeDeleteModal();
+                showToast('error', 'Failed to delete incidents. Please try again.');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            });
+        }
+
+        // ─── Single Delete ───
+        function openSingleDelete(id) {
+            singleDeleteId = id;
+            document.getElementById('singleDeleteId').textContent = '#' + id;
+            const modal = document.getElementById('singleDeleteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeSingleDeleteModal() {
+            const modal = document.getElementById('singleDeleteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            singleDeleteId = null;
+        }
+
+        function confirmSingleDelete() {
+            if (!singleDeleteId) return;
+
+            const btn = document.getElementById('confirmSingleDeleteBtn');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-[10px]"></i> <span>Deleting...</span>';
+
+            fetch(`/admin/api/reports/${singleDeleteId}`, {
+                method: 'DELETE'
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Delete failed');
+                return res.json();
+            })
+            .then(data => {
+                closeSingleDeleteModal();
+                showToast('success', `Incident #${singleDeleteId} deleted successfully`);
+                // RELOAD FROM DATABASE
+                loadIncidents();
+            })
+            .catch(err => {
+                console.error('Single delete error:', err);
+                closeSingleDeleteModal();
+                showToast('error', 'Failed to delete incident. Please try again.');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            });
+        }
+
+        // ─── Toast ───
+        function showToast(type, message) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMessage');
+
+            icon.className = type === 'success'
+                ? 'fa-solid fa-check-circle text-green-400'
+                : 'fa-solid fa-circle-xmark text-red-400';
+            msg.textContent = message;
+
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+    </script>
+</body>
+</html>

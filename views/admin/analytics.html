@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrics & Analytics | Bullying Incident Reporting & Assessment System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; }
+        .animate-slide-down { animation: slideDown 0.4s ease-out forwards; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+
+        .nav-link {
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: #F4C430;
+            border-radius: 0 4px 4px 0;
+            transition: height 0.2s ease;
+        }
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            height: 60%;
+        }
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(11, 90, 42, 0.05);
+            color: #0B5A2A;
+        }
+        .nav-link.active {
+            font-weight: 600;
+            background: rgba(11, 90, 42, 0.08);
+        }
+
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -4px rgba(0,0,0,0.08);
+        }
+
+        .time-filter {
+            transition: all 0.2s ease;
+        }
+        .time-filter.active {
+            background: #0B5A2A;
+            color: white;
+            border-color: #0B5A2A;
+        }
+        .time-filter:hover:not(.active) {
+            background: rgba(11, 90, 42, 0.05);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+        }
+
+        .export-btn {
+            transition: all 0.2s ease;
+        }
+        .export-btn:hover {
+            background: #0B5A2A;
+            color: white;
+            border-color: #0B5A2A;
+        }
+
+        .refresh-btn {
+            transition: all 0.2s ease;
+        }
+        .refresh-btn:hover {
+            transform: rotate(180deg);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-[#0B5A2A] text-white shadow-lg border-b-4 border-[#F4C430] animate-slide-down sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
+                    <img src="/images/logo5.png" alt="BIRAS" class="w-7 h-7 object-contain" width="28" height="28">
+                </div>
+                <div>
+                    <h1 class="font-bold text-base md:text-lg tracking-tight leading-tight">Dr. Gloria D. Lacson Foundation Colleges, Inc.</h1>
+                    <p class="text-xs text-[#F4C430] font-medium">Incident Management Workspace</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="hidden sm:inline-flex items-center gap-2 text-xs bg-white/10 border border-white/20 px-3 py-1.5 rounded-lg text-white/90">
+                    <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                    <i class="fa-solid fa-user-shield text-[10px]"></i>
+                    System Authenticated
+                </span>
+                <a href="/admin/logout" class="text-xs bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-100 hover:text-white px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-[10px]"></i>
+                    <span class="hidden sm:inline">Sign Out</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Sidebar -->
+        <aside class="lg:col-span-3 xl:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-4 sticky top-24">
+                <h3 class="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-3 px-3">Navigation</h3>
+                <nav class="space-y-1">
+                    <a href="/admin/dashboard" class="nav-link flex items-center gap-3 text-gray-600 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-chart-pie text-xs"></i>
+                        </div>
+                        <span>Overview</span>
+                    </a>
+                    <a href="/admin/reports" class="nav-link flex items-center gap-3 text-gray-600 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-folder-open text-xs"></i>
+                        </div>
+                        <span>Incident Logs</span>
+                    </a>
+                    <a href="/admin/analytics" class="nav-link active flex items-center gap-3 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                            <i class="fa-solid fa-chart-line text-xs"></i>
+                        </div>
+                        <span>Analytics</span>
+                    </a>
+                    <a href="/admin/settings" class="nav-link flex items-center gap-3 text-gray-600 text-sm px-3 py-2.5 rounded-lg w-full">
+                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-gear text-xs"></i>
+                        </div>
+                        <span>Settings</span>
+                    </a>
+                </nav>
+
+                <div class="mt-6 pt-4 border-t border-gray-100">
+                    <div class="bg-gradient-to-br from-[#0B5A2A]/5 to-[#F4C430]/5 rounded-lg p-3 border border-[#0B5A2A]/10">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <i class="fa-solid fa-shield-halved text-[#0B5A2A] text-xs"></i>
+                            <span class="text-xs font-bold text-[#0B5A2A]">RA 10627</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500 leading-relaxed">Anti-Bullying Act compliance monitoring active.</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="lg:col-span-9 xl:col-span-10 space-y-6">
+
+            <!-- Page Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in-up">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-8 h-8 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                            <i class="fa-solid fa-chart-pie text-sm"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900">Incident Classification Metrics</h2>
+                    </div>
+                    <p class="text-xs text-gray-500 ml-10">Real-time aggregate data visualization of metrics reported across institutional domains.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="exportChart()" class="export-btn text-xs bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg font-medium transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-download text-[10px]"></i>
+                        Export Chart
+                    </button>
+                    <button onclick="refreshData()" class="refresh-btn text-xs bg-[#0B5A2A] hover:bg-[#094a22] text-white px-3 py-2 rounded-lg font-medium transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate text-[10px]"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Time Filter -->
+            <div class="flex gap-2 animate-fade-in-up delay-100">
+                <button onclick="setTimeRange('7d')" class="time-filter active text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200" data-range="7d">Last 7 Days</button>
+                <button onclick="setTimeRange('30d')" class="time-filter text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600" data-range="30d">Last 30 Days</button>
+                <button onclick="setTimeRange('90d')" class="time-filter text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600" data-range="90d">Last 90 Days</button>
+                <button onclick="setTimeRange('all')" class="time-filter text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600" data-range="all">All Time</button>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in-up delay-100">
+                <div class="stat-card bg-white rounded-xl shadow-sm border border-gray-200/80 p-4">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Reports</p>
+                    <h4 id="stat-total" class="text-2xl font-extrabold text-gray-800 mt-1">0</h4>
+                </div>
+                <div class="stat-card bg-white rounded-xl shadow-sm border border-gray-200/80 p-4">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Categories</p>
+                    <h4 id="stat-categories" class="text-2xl font-extrabold text-gray-800 mt-1">0</h4>
+                </div>
+                <div class="stat-card bg-white rounded-xl shadow-sm border border-gray-200/80 p-4">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Top Type</p>
+                    <h4 id="stat-top" class="text-lg font-extrabold text-[#0B5A2A] mt-1 truncate">—</h4>
+                </div>
+                <div class="stat-card bg-white rounded-xl shadow-sm border border-gray-200/80 p-4">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Anonymous</p>
+                    <h4 id="stat-anon" class="text-2xl font-extrabold text-gray-800 mt-1">0%</h4>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- Donut Chart: Incident Classification -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6 animate-fade-in-up delay-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm">Incident Classification</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Distribution by bullying type from database</p>
+                        </div>
+                        <span class="text-[10px] bg-[#0B5A2A]/10 text-[#0B5A2A] font-bold px-2 py-1 rounded-full">Live DB</span>
+                    </div>
+                    <div class="chart-container flex items-center justify-center">
+                        <canvas id="incidentChart"></canvas>
+                    </div>
+                    <div id="chartLegend" class="mt-4 grid grid-cols-2 gap-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Bar Chart: Monthly Trend -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6 animate-fade-in-up delay-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm">Monthly Distribution</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Reports per month</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom: Detailed Breakdown Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6 animate-fade-in-up delay-400">
+                <h3 class="font-bold text-gray-800 text-sm mb-4">Detailed Breakdown</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider py-3 px-4">Category</th>
+                                <th class="text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider py-3 px-4">Count</th>
+                                <th class="text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider py-3 px-4">Percentage</th>
+                                <th class="text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider py-3 px-4">Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody id="breakdownTable">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <img src="/images/logo5.png" alt="BIRAS" class="w-5 h-5 rounded object-contain opacity-50" width="20" height="20">
+                    <span class="text-xs text-gray-500">&copy; 2026 Dr. Gloria D. Lacson Foundation Colleges, Inc.</span>
+                </div>
+                <p class="text-[10px] text-gray-400">In compliance with RA 10627 (Anti-Bullying Act of 2013)</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ─── Brand Color Palette ───
+        const brandColors = {
+            'Physical Bullying': '#ef4444',
+            'Verbal Bullying': '#f97316', 
+            'Cyberbullying': '#a855f7',
+            'Social Exclusion': '#3b82f6',
+            'Other/Unspecified': '#9ca3af',
+            'default': ['#0B5A2A', '#F7931E', '#F4C430', '#3b82f6', '#ef4444', '#a855f7', '#10b981']
+        };
+
+        let donutChart = null;
+        let barChart = null;
+        let currentRange = '7d';
+
+        // ─── Initialize ───
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAnalyticsData();
+        });
+
+        // ─── Fetch Data from Database ───
+        function loadAnalyticsData() {
+            // PRIMARY: Fetch from your database API
+            // Replace this URL with your actual endpoint
+            fetch('/admin/api/analytics-data')
+                .then(res => {
+                    if (!res.ok) throw new Error('API not available');
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.length === 0) {
+                        showEmptyState();
+                        return;
+                    }
+                    renderCharts(data);
+                    updateStats(data);
+                    renderBreakdownTable(data);
+                })
+                .catch(err => {
+                    console.log('Database API not available, using demo data:', err);
+                    // FALLBACK: Demo data for preview
+                    const demoData = [
+                        { category: 'Physical Bullying', count: 8 },
+                        { category: 'Verbal Bullying', count: 6 },
+                        { category: 'Cyberbullying', count: 5 },
+                        { category: 'Social Exclusion', count: 3 },
+                        { category: 'Other/Unspecified', count: 2 }
+                    ];
+                    renderCharts(demoData);
+                    updateStats(demoData);
+                    renderBreakdownTable(demoData);
+                });
+        }
+
+        // ─── Render Charts ───
+        function renderCharts(data) {
+            const categories = data.map(item => item.category || 'Unspecified');
+            const counts = data.map(item => item.count);
+            const colors = categories.map(cat => brandColors[cat] || brandColors.default[Math.floor(Math.random() * brandColors.default.length)]);
+
+            // Destroy existing charts
+            if (donutChart) donutChart.destroy();
+            if (barChart) barChart.destroy();
+
+            // Donut Chart
+            const ctx = document.getElementById('incidentChart').getContext('2d');
+            donutChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: colors,
+                        borderWidth: 3,
+                        borderColor: '#ffffff',
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1f2937',
+                            padding: 12,
+                            titleFont: { size: 13, weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a,b) => a+b, 0);
+                                    const pct = Math.round((context.raw / total) * 100);
+                                    return ` ${context.label}: ${context.raw} cases (${pct}%)`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        duration: 1000
+                    }
+                }
+            });
+
+            // Custom Legend
+            const total = counts.reduce((a,b) => a+b, 0);
+            document.getElementById('chartLegend').innerHTML = categories.map((cat, i) => `
+                <div class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition">
+                    <div class="w-3 h-3 rounded-full flex-shrink-0" style="background: ${colors[i]}"></div>
+                    <span class="text-xs text-gray-700 truncate">${cat}</span>
+                    <span class="text-xs font-bold text-gray-900 ml-auto">${counts[i]}</span>
+                </div>
+            `).join('');
+
+            // Bar Chart (Monthly simulation)
+            const barCtx = document.getElementById('monthlyChart').getContext('2d');
+            barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        label: 'Reports',
+                        data: counts,
+                        backgroundColor: colors.map(c => c + 'cc'),
+                        borderColor: colors,
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f3f4f6' },
+                            ticks: { font: { size: 11 }, color: '#9ca3af' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 10 }, color: '#6b7280' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ─── Update Stats ───
+        function updateStats(data) {
+            const total = data.reduce((a, b) => a + b.count, 0);
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-categories').textContent = data.length;
+
+            const top = data.reduce((max, item) => item.count > max.count ? item : max, data[0]);
+            document.getElementById('stat-top').textContent = top ? top.category : '—';
+
+            // Anon rate (simulated - in production fetch from /admin/api/stats)
+            document.getElementById('stat-anon').textContent = '58%';
+        }
+
+        // ─── Render Breakdown Table ───
+        function renderBreakdownTable(data) {
+            const total = data.reduce((a, b) => a + b.count, 0);
+            const tbody = document.getElementById('breakdownTable');
+
+            tbody.innerHTML = data.map((item, i) => {
+                const pct = Math.round((item.count / total) * 100);
+                const color = brandColors[item.category] || brandColors.default[i % brandColors.default.length];
+                return `
+                    <tr class="border-b border-gray-100 hover:bg-gray-50/50 transition">
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2.5 h-2.5 rounded-full" style="background: ${color}"></div>
+                                <span class="text-sm font-medium text-gray-700">${item.category}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-sm font-bold text-gray-800">${item.count}</td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden max-w-[100px]">
+                                    <div class="h-full rounded-full transition-all duration-700" style="width: ${pct}%; background: ${color}"></div>
+                                </div>
+                                <span class="text-xs text-gray-500 w-10">${pct}%</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="text-xs ${pct > 20 ? 'text-red-500' : pct > 10 ? 'text-amber-500' : 'text-green-500'} font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-trend-${pct > 15 ? 'up' : 'down'}"></i>
+                                ${pct > 15 ? 'High' : 'Low'}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ─── Show Empty State ───
+        function showEmptyState() {
+            document.getElementById('incidentChart').style.display = 'none';
+            document.getElementById('chartLegend').innerHTML = `
+                <div class="text-center py-8 text-gray-400">
+                    <i class="fa-solid fa-inbox text-2xl mb-2"></i>
+                    <p class="text-sm">No data available</p>
+                </div>
+            `;
+        }
+
+        // ─── Time Range Filter ───
+        function setTimeRange(range) {
+            currentRange = range;
+            document.querySelectorAll('.time-filter').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.range === range);
+                if (btn.dataset.range !== range) btn.classList.add('text-gray-600');
+                else btn.classList.remove('text-gray-600');
+            });
+
+            // In production: fetch(`/admin/api/analytics-data?range=${range}`)
+            // For demo, just reload with animation
+            const charts = document.querySelectorAll('.chart-container');
+            charts.forEach(c => { c.style.opacity = '0.5'; });
+            setTimeout(() => {
+                loadAnalyticsData();
+                charts.forEach(c => { c.style.opacity = '1'; });
+            }, 300);
+        }
+
+        // ─── Export Chart ───
+        function exportChart() {
+            const link = document.createElement('a');
+            link.download = `BIRAS_Analytics_${new Date().toISOString().split('T')[0]}.png`;
+            link.href = document.getElementById('incidentChart').toDataURL('image/png');
+            link.click();
+        }
+
+        // ─── Refresh ───
+        function refreshData() {
+            const btn = document.querySelector('.refresh-btn i');
+            btn.classList.add('fa-spin');
+            setTimeout(() => {
+                btn.classList.remove('fa-spin');
+                loadAnalyticsData();
+            }, 800);
+        }
+    </script>
+</body>
+</html>

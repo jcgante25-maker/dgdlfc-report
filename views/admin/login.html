@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | BIRAS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(11, 90, 42, 0.3); }
+            70% { box-shadow: 0 0 0 12px rgba(11, 90, 42, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(11, 90, 42, 0); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+            20%, 40%, 60%, 80% { transform: translateX(4px); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
+        .animate-slide-down { animation: slideDown 0.5s ease-out forwards; }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .float-icon { animation: float 3s ease-in-out infinite; }
+        .live-pulse { animation: pulse-ring 2s infinite; }
+
+        .login-input:focus {
+            border-color: #0B5A2A;
+            box-shadow: 0 0 0 3px rgba(11, 90, 42, 0.1);
+            outline: none;
+        }
+
+        .btn-primary {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+        .btn-primary:active::after {
+            width: 200px;
+            height: 200px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px -4px rgba(11, 90, 42, 0.3);
+        }
+
+        .error-box {
+            transition: all 0.3s ease;
+        }
+
+        .input-group {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            transition: color 0.2s ease;
+            pointer-events: none;
+        }
+        .login-input:focus + .input-icon,
+        .input-group:focus-within .input-icon {
+            color: #0B5A2A;
+        }
+
+        .logo-glow {
+            filter: drop-shadow(0 0 8px rgba(244, 196, 48, 0.3));
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 text-gray-800 min-h-screen flex flex-col font-sans">
+
+    <!-- Header -->
+    <header class="bg-[#0B5A2A] text-white shadow-lg border-b-4 border-[#F4C430] animate-slide-down sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <a href="/" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center group-hover:scale-105 ">
+                    <img src="/images/logo5.png" alt="BIRAS" class="w-8 h-8 object-contain" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-[#0B5A2A] font-bold text-lg\'>DG</span>'">
+                </div>
+                <div>
+                    <h1 class="text-sm md:text-base font-bold leading-tight tracking-tight">Dr. Gloria D. Lacson Foundation Colleges, Inc.</h1>
+                    <p class="text-xs text-[#F4C430] font-medium">Bullying Incident Reporting & Assessment System</p>
+                </div>
+            </a>
+            <a href="/" class="text-xs bg-[#F7931E] hover:bg-[#e8850f] px-4 py-2 rounded-lg text-white transition font-semibold shadow-md shadow-orange-500/20 flex items-center gap-2">
+                <i class="fa-solid fa-house text-[10px]"></i>
+                Public Portal
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center px-4 py-8 md:py-12">
+        <div class="w-full max-w-md animate-fade-in-up delay-100">
+
+            <!-- Login Card -->
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+
+                <!-- Card Header -->
+                <div class="bg-gradient-to-br from-[#0B5A2A] via-[#0d6b32] to-[#0B5A2A] p-8 text-center relative overflow-hidden">
+                    <div class="absolute top-4 right-6 w-12 h-12 bg-[#F4C430]/10 rounded-full float-icon"></div>
+                    <div class="absolute bottom-2 left-4 w-8 h-8 bg-[#F7931E]/10 rounded-full" style="animation: float 3s ease-in-out 1.5s infinite;"></div>
+
+                    <div class="relative z-10">
+                        <div class="w-20 h-20 bg-white/15 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20 overflow-hidden logo-glow">
+                            <img src="/images/logo5.png" alt="BIRAS" class="w-16 h-16 object-contain" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-shield-halved text-3xl text-[#F4C430]\'></i>'">
+                        </div>
+                        <h2 class="text-xl font-bold text-white mb-1">Administrative Login</h2>
+                        <p class="text-xs text-white/70">Authorized safety personnel and evaluators only</p>
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="p-6 md:p-8">
+
+                    <!-- Error Box -->
+                    <div id="error-box" class="error-box mb-5 p-3.5 bg-red-50 border border-red-200 text-red-700 text-sm font-medium rounded-xl hidden flex items-start gap-2.5">
+                        <div class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fa-solid fa-circle-exclamation text-red-500 text-xs"></i>
+                        </div>
+                        <span id="error-text" class="text-xs leading-relaxed">Invalid username or password.</span>
+                    </div>
+
+                    <form id="login-form" class="space-y-5">
+
+                        <!-- Username -->
+                        <div class="animate-fade-in-up delay-200">
+                            <label for="username" class="block text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                                Username
+                            </label>
+                            <div class="input-group">
+                                <i class="fa-solid fa-user input-icon text-sm"></i>
+                                <input type="text" id="username" name="username" required autocomplete="username"
+                                    class="login-input w-full border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm bg-gray-50/50 transition placeholder-gray-400"
+                                    placeholder="Enter admin username">
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="animate-fade-in-up delay-300">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label for="password" class="block text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                                    Password
+                                </label>
+                            </div>
+                            <div class="input-group">
+                                <i class="fa-solid fa-lock input-icon text-sm"></i>
+                                <input type="password" id="password" name="password" required autocomplete="current-password"
+                                    class="login-input w-full border border-gray-200 rounded-xl pl-10 pr-10 py-3 text-sm bg-gray-50/50 transition placeholder-gray-400"
+                                    placeholder="••••••••">
+                                <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
+                                    <i class="fa-solid fa-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Remember Me -->
+                        <div class="flex items-center justify-between animate-fade-in-up delay-300">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="rememberMe" class="w-4 h-4 rounded border-gray-300 text-[#0B5A2A] focus:ring-[#0B5A2A] cursor-pointer">
+                                <span class="text-xs text-gray-500">Remember me for 7 days</span>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="animate-fade-in-up delay-300">
+                            <button type="submit" id="submit-btn"
+                                class="btn-primary w-full bg-[#0B5A2A] hover:bg-[#094a22] text-white font-bold py-3.5 px-4 rounded-xl transition shadow-lg shadow-green-900/20 text-sm tracking-wide flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                                <span id="btnText">Sign In</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Info Box -->
+                    <div class="mt-6 pt-5 border-t border-gray-100 animate-fade-in-up delay-400">
+                        <div class="bg-[#0B5A2A]/5 rounded-xl p-4 border border-[#0B5A2A]/10">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center flex-shrink-0">
+                                    <img src="/images/logo.png" alt="BIRAS" class="w-5 h-5 object-contain opacity-60" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-circle-info text-[#0B5A2A] text-xs\'></i>'">
+                                </div>
+                                <div>
+                                    <p class="text-xs font-semibold text-gray-700 mb-0.5">Account Access Restricted</p>
+                                    <p class="text-[11px] text-gray-500 leading-relaxed">
+                                        Account generation is strictly managed via database provisioning scripts. Self-registration interfaces are disabled for regulatory compliance.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Help Link -->
+            <div class="text-center mt-6 animate-fade-in-up delay-400">
+                <p class="text-xs text-gray-400">
+                    Need assistance? Contact the 
+                    <a href="mailto:guidance@dglfc.edu.ph" class="text-[#0B5A2A] hover:text-[#F7931E] font-semibold transition">Guidance Office</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center gap-2">
+                <img src="/images/logo5.png" alt="BIRAS" class="w-5 h-5 object-contain opacity-40" onerror="this.style.display='none'">
+                <span class="text-xs text-gray-400">&copy; 2026 Dr. Gloria D. Lacson Foundation Colleges, Inc.</span>
+            </div>
+            <p class="text-[10px] text-gray-400">In compliance with RA 10627 (Anti-Bullying Act of 2013)</p>
+        </div>
+    </footer>
+
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('toggleIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye';
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const usernameInput = document.getElementById('username').value.trim();
+            const passwordInput = document.getElementById('password').value;
+            const errorBox = document.getElementById('error-box');
+            const errorText = document.getElementById('error-text');
+            const submitBtn = document.getElementById('submit-btn');
+            const btnText = document.getElementById('btnText');
+
+            // Basic validation
+            if (!usernameInput || !passwordInput) {
+                errorText.textContent = 'Please enter both username and password.';
+                errorBox.classList.remove('hidden');
+                errorBox.classList.add('animate-shake');
+                setTimeout(() => errorBox.classList.remove('animate-shake'), 400);
+                return;
+            }
+
+            // Hide error and set loading state
+            errorBox.classList.add('hidden');
+            submitBtn.disabled = true;
+            btnText.textContent = 'Authenticating...';
+            submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-xs"></i> <span>Authenticating...</span>';
+
+            // Build payload
+            const payload = new URLSearchParams();
+            payload.append('username', usernameInput);
+            payload.append('password', passwordInput);
+
+            // Submit
+            fetch('/admin/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: payload
+            })
+            .then(async response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return;
+                }
+                if (!response.ok) {
+                    const message = await response.text();
+                    throw new Error(message || 'Invalid credentials.');
+                }
+            })
+            .catch(err => {
+                errorText.textContent = err.message === 'Failed to fetch' 
+                    ? 'Connection failed. Ensure your server is running.' 
+                    : err.message;
+                errorBox.classList.remove('hidden');
+                errorBox.classList.add('animate-shake');
+                setTimeout(() => errorBox.classList.remove('animate-shake'), 400);
+
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket text-xs"></i> <span>Sign In</span>';
+            });
+        });
+
+        // Auto-focus username on load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('username').focus();
+        });
+    </script>
+</body>
+</html>

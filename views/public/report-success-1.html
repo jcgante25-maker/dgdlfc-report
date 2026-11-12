@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Submitted Successfully | Bullying Incident Reporting</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col justify-between font-sans">
+
+    <header class="bg-blue-900 text-white shadow-md">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-900 font-bold text-lg">
+                    DG
+                </div>
+                <div>
+                    <h1 class="text-sm md:text-base font-bold leading-tight">Dr. Gloria D. Lacson Foundation Colleges, Inc.</h1>
+                    <p class="text-xs text-blue-200">Bullying Reporting & Assessment System</p>
+                </div>
+            </div>
+            <a href="/" class="text-sm bg-blue-800 hover:bg-blue-700 px-3 py-2 rounded text-white font-medium transition">
+                Home
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-xl mx-auto px-4 py-12 flex-grow w-full flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl p-8 border border-gray-200 text-center w-full relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-2 bg-green-500"></div>
+
+            <div class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-4 animate-bounce">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Report Filed Successfully!</h2>
+            <p class="text-gray-600 text-sm mb-6">
+                Thank you for taking a stand. Your incident report has been securely saved and routed to the administration for formal assessment under Republic Act No. 10627.
+            </p>
+
+            <div class="bg-blue-50 border border-blue-100 rounded-lg p-5 mb-6">
+                <span class="block text-xs uppercase tracking-wider font-semibold text-blue-700 mb-1">Your Anonymous Tracking Token</span>
+                <div class="flex items-center justify-center space-x-3">
+                    <span id="tracking-token" class="text-2xl md:text-3xl font-mono font-black text-blue-950 tracking-wider">DG-LOADING</span>
+                    <button id="copy-btn" class="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-100 transition" title="Copy Token">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                        </svg>
+                    </button>
+                </div>
+                <p id="copy-toast" class="text-xs text-green-600 font-medium mt-1 opacity-0 transition-opacity duration-200">Token copied to clipboard!</p>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-md p-3 text-left mb-6 text-xs text-amber-800 space-y-1">
+                <p class="font-bold">⚠️ Important Instructions:</p>
+                <p>Please copy or write down this token now. To protect your anonymity, the system will not email this code to you. You will need it to track investigation status or read administrative responses.</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="/" class="bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2.5 px-5 rounded transition text-sm shadow-sm">
+                    Return to Home
+                </a>
+                <a href="/track" id="track-btn" class="bg-blue-950 hover:bg-blue-900 text-white font-semibold py-2.5 px-5 rounded transition text-sm shadow-sm">
+                    Track Report Status
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-100 border-t border-gray-200 text-center py-4 text-xs text-gray-500">
+        <p>&copy; 2026 Dr. Gloria D. Lacson Foundation Colleges, Inc. All rights reserved.</p>
+        <p class="mt-1">In compliance with the Anti-Bullying Act of 2013 (Republic Act No. 10627)</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Read URL search query string parameters (?token=DG-XXXXXX)
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+
+            const tokenDisplay = document.getElementById('tracking-token');
+            const copyBtn = document.getElementById('copy-btn');
+            const copyToast = document.getElementById('copy-toast');
+            const trackBtn = document.getElementById('track-btn');
+
+            if (token) {
+                // Populate the exact generated token string
+                const cleanToken = token.toUpperCase().trim();
+                tokenDisplay.textContent = cleanToken;
+                
+                // Dynamically route tracking dashboard paths if needed
+                trackBtn.href = `/track?token=${cleanToken}`;
+            } else {
+                tokenDisplay.textContent = 'ERROR';
+                tokenDisplay.classList.add('text-red-600');
+            }
+
+            // Clipboard Copy System
+            copyBtn.addEventListener('click', () => {
+                const textToCopy = tokenDisplay.textContent;
+                if (textToCopy && textToCopy !== 'ERROR' && textToCopy !== 'DG-LOADING') {
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        copyToast.classList.remove('opacity-0');
+                        setTimeout(() => {
+                            copyToast.classList.add('opacity-0');
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Could not copy token text: ', err);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Case | Bullying Incident Reporting & Assessment System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; }
+        .animate-slide-down { animation: slideDown 0.4s ease-out forwards; }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+
+        .detail-card {
+            transition: all 0.2s ease;
+        }
+        .detail-card:hover {
+            border-color: rgba(11, 90, 42, 0.2);
+        }
+
+        .status-select {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .status-select:focus {
+            border-color: #0B5A2A;
+            box-shadow: 0 0 0 3px rgba(11, 90, 42, 0.1);
+            outline: none;
+        }
+
+        .btn-commit {
+            background: linear-gradient(135deg, #F7931E 0%, #e8850f 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-commit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(247, 147, 30, 0.35);
+        }
+        .btn-commit:active {
+            transform: translateY(0);
+        }
+        .btn-commit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .evidence-img {
+            transition: all 0.3s ease;
+            cursor: zoom-in;
+        }
+        .evidence-img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .delete-btn {
+            transition: all 0.2s ease;
+        }
+        .delete-btn:hover {
+            color: #dc2626;
+            background: rgba(220, 38, 38, 0.05);
+        }
+
+        .timeline-dot {
+            position: relative;
+        }
+        .timeline-dot::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 2px;
+            height: calc(100% + 16px);
+            background: #e5e7eb;
+        }
+        .timeline-item:last-child .timeline-dot::after {
+            display: none;
+        }
+
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-investigating { background: #dbeafe; color: #1e40af; }
+        .badge-resolved { background: #d1fae5; color: #065f46; }
+        .badge-escalated { background: #fee2e2; color: #991b1b; }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 14px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            animation: slideDown 0.3s ease-out;
+            max-width: 380px;
+            color: white;
+        }
+        .toast-success { background: #10b981; }
+        .toast-error { background: #ef4444; }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #0B5A2A;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* Inline saving indicator */
+        .saving-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: #0B5A2A;
+            font-weight: 600;
+        }
+        .saving-indicator .dot {
+            width: 6px;
+            height: 6px;
+            background: #0B5A2A;
+            border-radius: 50%;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+        .saving-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
+        .saving-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* FIX: Privacy notice z-index and scroll behavior */
+        .privacy-card {
+            position: relative;
+            z-index: 1;
+        }
+        .resolution-panel {
+            position: relative;
+            z-index: 10;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-[#0B5A2A] text-white shadow-lg border-b-4 border-[#F4C430] animate-slide-down sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
+                    <img src="/images/logo5.png" alt="BIRAS" class="w-7 h-7 object-contain" width="28" height="28" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-white font-bold text-sm\'>DG</span>';">
+                </div>
+                <div>
+                    <h1 class="font-bold text-base tracking-tight leading-tight">Dr. Gloria D. Lacson Foundation Colleges, Inc.</h1>
+                    <p class="text-xs text-[#F4C430] font-medium">Incident Management Workspace</p>
+                </div>
+            </div>
+            <a href="/admin/reports" class="text-sm bg-white/10 hover:bg-white/20 border border-white/20 text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left text-xs"></i>
+                Back to Logs
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6 md:py-8 space-y-6">
+
+        <!-- Case Header -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in-up">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                    <i class="fa-solid fa-file-shield text-xl"></i>
+                </div>
+                <div>
+                    <h2 id="case-title-id" class="text-xl font-bold text-gray-900">Loading Case File...</h2>
+                    <p class="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
+                        <i class="fa-solid fa-lock text-[10px]"></i>
+                        Please evaluate information with high regulatory privacy discretion.
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="saving-indicator" class="saving-indicator hidden">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    Saving...
+                </span>
+                <span id="case-badge-status" class="self-start sm:self-auto px-4 py-1.5 rounded-full text-xs font-bold badge-pending flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+                    Determining...
+                </span>
+            </div>
+        </div>
+
+        <!-- Evidence Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6 animate-fade-in-up delay-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-paperclip text-[#0B5A2A]"></i>
+                    <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Attached Supporting Evidence</h3>
+                </div>
+                <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded-lg font-medium">Click image to expand</span>
+            </div>
+            <div id="evidence-display-zone" class="flex justify-center min-h-[120px] items-center bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+                <div class="text-center py-8">
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-2">
+                        <i class="fa-solid fa-image text-gray-300"></i>
+                    </div>
+                    <p class="text-sm text-gray-400">Loading attachments...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+            <!-- Left: Incident Details (3 cols) -->
+            <div class="lg:col-span-3 space-y-4 animate-fade-in-up delay-200">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6">
+                    <div class="flex items-center gap-2 mb-5 pb-3 border-b border-gray-100">
+                        <div class="w-7 h-7 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                            <i class="fa-solid fa-circle-info text-xs"></i>
+                        </div>
+                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Incident Details</h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Reporter Information -->
+                        <div class="detail-card p-4 rounded-lg border border-gray-100 bg-gray-50/30">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="w-8 h-8 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center">
+                                    <i class="fa-solid fa-user-shield text-[#0B5A2A] text-sm"></i>
+                                </div>
+                                <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wide">
+                                    Reporter Information
+                                </h4>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Full Name</label>
+                                    <p id="detail-reporter-name" class="text-sm text-gray-800 font-semibold">Loading...</p>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Email / Mobile Number</label>
+                                    <p id="detail-reporter-contact" class="text-sm text-gray-800 font-semibold break-all">Loading...</p>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Reporter Affiliation</label>
+                                    <p id="detail-reporter" class="text-sm text-gray-800 font-semibold">Loading...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-card p-3 rounded-lg border border-gray-100 bg-gray-50/30">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Classification Category</label>
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center">
+                                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-[10px]"></i>
+                                </div>
+                                <p id="detail-type" class="text-sm text-gray-800 font-semibold">...</p>
+                            </div>
+                        </div>
+
+                        <div class="detail-card p-3 rounded-lg border border-gray-100 bg-gray-50/30">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Date & Location</label>
+                            <div class="flex items-center gap-2 text-sm text-gray-700">
+                                <i class="fa-solid fa-calendar-days text-gray-400 text-[10px]"></i>
+                                <span id="detail-datetime">...</span>
+                                <span class="text-gray-300">|</span>
+                                <i class="fa-solid fa-location-dot text-gray-400 text-[10px]"></i>
+                                <span id="detail-location">...</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card p-3 rounded-lg border border-gray-100 bg-gray-50/30">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Full Statement Narrative</label>
+                            <div id="detail-description" class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap bg-white p-4 rounded-lg border border-gray-100 min-h-[100px]">
+                                ...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Notes History -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6 animate-fade-in-up delay-300">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-7 h-7 rounded-lg bg-[#F4C430]/20 flex items-center justify-center text-[#B8950C]">
+                            <i class="fa-solid fa-sticky-note text-xs"></i>
+                        </div>
+                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Investigation Notes History</h3>
+                    </div>
+                    <div id="notes-history-list" class="space-y-3">
+                        <div class="text-center py-8 text-gray-400">
+                            <i class="fa-solid fa-clipboard text-2xl mb-2 text-gray-300"></i>
+                            <p class="text-sm">No notes added yet.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case Timeline -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6 animate-fade-in-up delay-300">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-7 h-7 rounded-lg bg-[#0B5A2A]/10 flex items-center justify-center text-[#0B5A2A]">
+                            <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+                        </div>
+                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Case Timeline</h3>
+                    </div>
+                    <div class="space-y-0" id="caseTimeline">
+                        <div class="timeline-item flex items-start gap-3 pb-4">
+                            <div class="timeline-dot w-4 h-4 rounded-full bg-[#0B5A2A] flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-800">Report Submitted</p>
+                                <p class="text-[10px] text-gray-400" id="timeline-submitted">...</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item flex items-start gap-3 pb-4">
+                            <div class="timeline-dot w-4 h-4 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-800">Under Review</p>
+                                <p class="text-[10px] text-gray-400">Awaiting administrator evaluation</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item flex items-start gap-3">
+                            <div class="timeline-dot w-4 h-4 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-800">Resolution</p>
+                                <p class="text-[10px] text-gray-400">Case closure pending</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Resolution Panel (2 cols) -->
+            <div class="lg:col-span-2 space-y-4 animate-fade-in-up delay-300">
+                <!-- FIX: Removed sticky positioning to prevent overlap issues -->
+                <div class="resolution-panel bg-white rounded-xl shadow-sm border border-gray-200/80 p-6">
+                    <div class="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100">
+                        <div class="w-8 h-8 rounded-lg bg-[#F4C430]/20 flex items-center justify-center text-[#B8950C]">
+                            <i class="fa-solid fa-gavel text-sm"></i>
+                        </div>
+                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Resolution</h3>
+                    </div>
+
+                    <form id="status-update-form" class="space-y-5">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Current Status <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i class="fa-solid fa-tag absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                                <select id="status-select" class="status-select w-full bg-gray-50 border border-gray-200 rounded-xl pl-9 pr-4 py-3 text-sm font-semibold text-gray-700 appearance-none cursor-pointer" required>
+                                    <option value="">Select Status...</option>
+                                    <option value="Pending">Pending Evaluation</option>
+                                    <option value="Under Investigation">Under Investigation</option>
+                                    <option value="Resolved">Resolved</option>
+                                    <option value="Escalated">Escalated</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] pointer-events-none"></i>
+                            </div>
+                            <p class="text-[10px] text-red-500 mt-1 hidden" id="status-error">Please select a status.</p>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Administrative Remarks <span class="text-red-500">*</span></label>
+                            <textarea id="status-notes" rows="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-700 focus:border-[#0B5A2A] focus:ring-2 focus:ring-[#0B5A2A]/10 outline-none resize-y transition" placeholder="Add investigation notes, actions taken, follow-up plans... These will be visible to the reporter on Track Report." required></textarea>
+                            <p class="text-[10px] text-red-500 mt-1 hidden" id="remarks-error">Please enter remarks.</p>
+                            <p class="text-[10px] text-gray-400 mt-1"><i class="fa-solid fa-eye text-[9px]"></i> Visible to reporter on Track Report page</p>
+                        </div>
+
+                        <button type="submit" class="btn-commit w-full text-white font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm" id="submitBtn">
+                            <i class="fa-solid fa-check"></i>
+                            <span id="submitBtnText">Commit Changes</span>
+                        </button>
+
+                        <button type="button" id="delete-case-btn" class="delete-btn w-full text-gray-400 hover:text-red-500 text-xs font-bold py-2 rounded-lg transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-trash-can text-[10px]"></i>
+                            Delete Case File
+                        </button>
+                    </form>
+                </div>
+
+                <!-- FIX: Privacy notice now has proper z-index and is NOT sticky -->
+                <div class="privacy-card bg-gradient-to-br from-[#0B5A2A]/5 to-[#F4C430]/5 rounded-xl border border-[#0B5A2A]/10 p-4 animate-fade-in-up delay-400">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-shield-halved text-[#0B5A2A] text-xs"></i>
+                        <span class="text-xs font-bold text-[#0B5A2A]">Privacy Notice</span>
+                    </div>
+                    <p class="text-[10px] text-gray-500 leading-relaxed">
+                        All case information is protected under Republic Act No. 10627. Do not share details outside authorized personnel.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 mt-8">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <img src="/images/logo5.png" alt="BIRAS" class="w-5 h-5 rounded object-contain opacity-50" width="20" height="20" onerror="this.style.display='none';">
+                    <span class="text-xs text-gray-500">&copy; 2026 Dr. Gloria D. Lacson Foundation Colleges, Inc.</span>
+                </div>
+                <p class="text-[10px] text-gray-400">In compliance with RA 10627 (Anti-Bullying Act of 2013)</p>
+            </div>
+        </div>  
+    </footer>
+
+    <script>
+        // ─── Get Report ID from URL ───
+        const pathSegments = window.location.pathname.split('/');
+        const reportId = pathSegments[pathSegments.length - 1];
+        const displayZone = document.getElementById('evidence-display-zone');
+        let currentReport = null;
+
+        // ─── Status Badge Config ───
+        const statusConfig = {
+            'Pending': { class: 'badge-pending', icon: 'fa-clock', label: 'Pending Evaluation' },
+            'Under Investigation': { class: 'badge-investigating', icon: 'fa-magnifying-glass', label: 'Under Investigation' },
+            'Resolved': { class: 'badge-resolved', icon: 'fa-check', label: 'Resolved' },
+            'Escalated': { class: 'badge-escalated', icon: 'fa-arrow-up', label: 'Escalated' }
+        };
+
+        // ─── Toast System ───
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-times-circle';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // ─── Loading ───
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').classList.toggle('active', show);
+        }
+
+        // ─── Format Date ───
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-US', { 
+                year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        // ─── Render Notes History ───
+        function renderNotesHistory(report) {
+            const container = document.getElementById('notes-history-list');
+
+            if (!report.admin_notes || !report.admin_notes.trim()) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fa-solid fa-clipboard text-2xl mb-2 text-gray-300"></i>
+                        <p class="text-sm">No notes added yet.</p>
+                        <p class="text-[10px] mt-1">Add remarks using the form on the right.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="p-4 rounded-xl border-l-4 border-[#0B5A2A] bg-[#0B5A2A]/5 animate-fade-in-up">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-bold text-gray-700 flex items-center gap-1">
+                            <i class="fa-solid fa-user-shield text-[10px]"></i> Administrator
+                        </span>
+                        <span class="text-[10px] text-gray-400">${formatDate(report.updated_at || report.created_at)}</span>
+                    </div>
+                    <p class="text-sm text-gray-700 leading-relaxed">${report.admin_notes}</p>
+                    ${report.status ? `
+                        <div class="mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold ${statusConfig[report.status]?.class || 'badge-pending'}">
+                            <i class="fa-solid fa-tag text-[8px]"></i> ${report.status}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // ─── Fetch Case Details ───
+        document.addEventListener('DOMContentLoaded', () => {
+            showLoading(true);
+
+            fetch(`/admin/api/reports/${reportId}`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to fetch');
+                    return res.json();
+                })
+                .then(report => {
+                    currentReport = report;
+                    showLoading(false);
+
+                    // Header
+                    document.getElementById('case-title-id').textContent = `Incident Case Investigation File #${report.id}`;
+
+                    // Status badge
+                    const status = report.status || 'Pending';
+                    const config = statusConfig[status] || statusConfig['Pending'];
+                    const badge = document.getElementById('case-badge-status');
+                    badge.className = `self-start sm:self-auto px-4 py-1.5 rounded-full text-xs font-bold ${config.class} flex items-center gap-1.5`;
+                    badge.innerHTML = `<i class="fa-solid ${config.icon} text-[10px]"></i> ${config.label}`;
+
+                    // Details
+                    // Reporter Information
+                    document.getElementById('detail-reporter-name').textContent =
+                        report.reporter_name || 'Anonymous Submission';
+                    document.getElementById('detail-reporter-contact').textContent =
+                        report.reporter_contact || 'Not Provided';
+                    document.getElementById('detail-reporter').textContent =
+                        report.reporter_type || 'Student/Staff';
+                    document.getElementById('detail-type').textContent = report.category || 'Other/Unspecified';
+                    document.getElementById('detail-description').textContent = report.description || 'No descriptive narrative log provided.';
+                    document.getElementById('detail-datetime').textContent = report.incident_date ? new Date(report.incident_date).toLocaleString() : 'N/A';
+                    document.getElementById('detail-location').textContent = report.incident_location || report.location || 'N/A';
+                    document.getElementById('timeline-submitted').textContent = report.created_at ? new Date(report.created_at).toLocaleString() : 'N/A';
+
+                    // Form values
+                    document.getElementById('status-select').value = status;
+                    document.getElementById('status-notes').value = report.admin_notes || '';
+
+                    // Evidence
+                    if (report.evidence_path) {
+                        displayZone.innerHTML = `
+                            <div class="relative group cursor-zoom-in" onclick="window.open('${report.evidence_path}', '_blank')">
+                                <img src="${report.evidence_path}" alt="Evidence" 
+                                    class="evidence-img max-h-[300px] w-auto rounded-xl border border-gray-200 shadow-sm">
+                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all rounded-xl flex items-center justify-center">
+                                    <span class="opacity-0 group-hover:opacity-100 transition text-white text-xs font-bold bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                                        <i class="fa-solid fa-expand mr-1"></i> Click to Expand
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        displayZone.innerHTML = `
+                            <div class="text-center py-8">
+                                <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-2">
+                                    <i class="fa-solid fa-image text-gray-300 text-lg"></i>
+                                </div>
+                                <p class="text-sm text-gray-400">No evidence attached to this report.</p>
+                            </div>
+                        `;
+                    }
+
+                    // Render notes history
+                    renderNotesHistory(report);
+                })
+                .catch(err => {
+                    showLoading(false);
+                    console.error('Failed to load case data:', err);
+                    document.getElementById('case-title-id').textContent = "Error Loading Case File";
+                    showToast('Failed to load case data. Please refresh.', 'error');
+                    displayZone.innerHTML = `
+                        <div class="text-center py-8">
+                            <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-2">
+                                <i class="fa-solid fa-triangle-exclamation text-red-400 text-lg"></i>
+                            </div>
+                            <p class="text-sm text-red-400">Error loading attached files.</p>
+                        </div>
+                    `;
+                });
+
+            // ─── Update Status & Remarks (USES EXISTING /status endpoint) ───
+            document.getElementById('status-update-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const status = document.getElementById('status-select').value;
+                const remarks = document.getElementById('status-notes').value.trim();
+
+                // Validation
+                let hasError = false;
+
+                if (!status) {
+                    document.getElementById('status-error').classList.remove('hidden');
+                    hasError = true;
+                } else {
+                    document.getElementById('status-error').classList.add('hidden');
+                }
+
+                if (!remarks) {
+                    document.getElementById('remarks-error').classList.remove('hidden');
+                    hasError = true;
+                } else {
+                    document.getElementById('remarks-error').classList.add('hidden');
+                }
+
+                if (hasError) {
+                    e.target.classList.add('animate-shake');
+                    setTimeout(() => e.target.classList.remove('animate-shake'), 400);
+                    return;
+                }
+
+                // UI state
+                const btn = document.getElementById('submitBtn');
+                const btnText = document.getElementById('submitBtnText');
+                const indicator = document.getElementById('saving-indicator');
+
+                btn.disabled = true;
+                btnText.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Saving...';
+                indicator.classList.remove('hidden');
+
+                // FIX: Use the EXISTING /status endpoint that already works in your controller
+                // Your adminController.updateReportStatus handles both status and admin_notes
+                fetch(`/admin/api/reports/${reportId}/status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: status, admin_notes: remarks })
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        return res.json().then(err => { throw new Error(err.error || 'Server error'); });
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    btnText.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
+                    btn.style.background = '#10b981';
+                    indicator.classList.add('hidden');
+                    showToast('Case updated successfully!');
+
+                    // Refresh after brief delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+                })
+                .catch(err => {
+                    console.error('Update error:', err);
+                    btnText.innerHTML = '<i class="fa-solid fa-xmark"></i> Failed';
+                    btn.style.background = '#ef4444';
+                    indicator.classList.add('hidden');
+                    showToast('Failed to save: ' + err.message, 'error');
+
+                    setTimeout(() => {
+                        btnText.innerHTML = '<i class="fa-solid fa-check"></i> Commit Changes';
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 2500);
+                });
+            });
+
+            // ─── Delete Case ───
+            document.getElementById('delete-case-btn').addEventListener('click', () => {
+                const firstConfirm = confirm("Are you sure you want to delete this incident report? This action cannot be undone.");
+                if (!firstConfirm) return;
+
+                const secondConfirm = confirm("FINAL WARNING: This will permanently remove this case from the database. Confirm deletion?");
+                if (!secondConfirm) return;
+
+                fetch(`/admin/api/reports/${reportId}`, { method: 'DELETE' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast('Case file successfully deleted.');
+                            setTimeout(() => window.location.href = '/admin/reports', 1000);
+                        } else {
+                            showToast(data.error || 'Failed to delete.', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Delete error:', err);
+                        showToast('Failed to delete case.', 'error');
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
